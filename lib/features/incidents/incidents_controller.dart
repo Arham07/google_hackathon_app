@@ -30,6 +30,9 @@ class IncidentsController extends ChangeNotifier {
   String? errorMessage;
   String? mapEventsError;
 
+  /// When set, [MapTabScreen] should fly the camera here and show the peek card.
+  Incident? pendingMapFocus;
+
   /// Incidents with valid coordinates for map markers.
   List<Incident> get mapEventsWithCoordinates => mapEvents
       .where((Incident i) => i.latitude != 0 || i.longitude != 0)
@@ -63,6 +66,17 @@ class IncidentsController extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void requestMapFocus(Incident incident) {
+    pendingMapFocus = incident;
+    notifyListeners();
+  }
+
+  void clearPendingMapFocus() {
+    if (pendingMapFocus == null) return;
+    pendingMapFocus = null;
+    notifyListeners();
   }
 
   Future<void> setMode(IncidentListMode newMode) async {

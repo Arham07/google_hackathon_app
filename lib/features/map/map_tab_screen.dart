@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_hackathon_app/features/incidents/incident_detail_screen.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
-import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/location_service.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/alert_marker_icon.dart';
+import 'package:google_hackathon_app/widgets/map_incident_peek_card.dart';
 import 'package:google_hackathon_app/widgets/map_search_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -32,13 +34,44 @@ class _MapTabScreenState extends State<MapTabScreen> {
   LatLng? _currentPosition;
   bool _locationReady = false;
   bool _mapReady = false;
+  Incident? _selectedMapIncident;
+
+  IncidentsController? _incidentsController;
 
   Set<Marker> get _allMarkers => {..._incidentMarkers, ?_searchMarker};
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrapMap());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final IncidentsController c = context.read<IncidentsController>();
+      _incidentsController = c;
+      c.addListener(_onIncidentsControllerChanged);
+      _drainPendingMapFocus();
+      _bootstrapMap();
+    });
+  }
+
+  @override
+  void dispose() {
+    _incidentsController?.removeListener(_onIncidentsControllerChanged);
+    super.dispose();
+  }
+
+  void _onIncidentsControllerChanged() {
+    if (!mounted) return;
+    _drainPendingMapFocus();
+  }
+
+  void _drainPendingMapFocus() {
+    final IncidentsController? c = _incidentsController;
+    if (c == null || !mounted) return;
+    final Incident? pending = c.pendingMapFocus;
+    if (pending == null) return;
+    if (!_mapReady) return;
+    c.clearPendingMapFocus();
+    setState(() => _selectedMapIncident = pending);
+    unawaited(_animateToIncident(pending));
   }
 
   Future<void> _bootstrapMap() async {
@@ -78,6 +111,8 @@ class _MapTabScreenState extends State<MapTabScreen> {
       _incidentMarkers = _buildMarkersFromIncidents(incidents.mapEventsWithCoordinates, icon);
       _mapReady = true;
     });
+
+    _drainPendingMapFocus();
   }
 
   Set<Marker> _buildMarkersFromIncidents(List<Incident> incidents, BitmapDescriptor icon) {
@@ -86,7 +121,12 @@ class _MapTabScreenState extends State<MapTabScreen> {
         markerId: MarkerId(incident.id),
         position: LatLng(incident.latitude, incident.longitude),
         icon: icon,
-        infoWindow: InfoWindow(title: incident.title, snippet: incident.address ?? incident.area),
+        infoWindow: InfoWindow.noText,
+        consumeTapEvents: true,
+        onTap: () {
+          setState(() => _selectedMapIncident = incident);
+          unawaited(_animateToIncident(incident));
+        },
       );
     }).toSet();
   }
@@ -98,7 +138,30 @@ class _MapTabScreenState extends State<MapTabScreen> {
     });
   }
 
+  Future<void> _animateToIncident(Incident incident) async {
+    final double lat = incident.mapLatitude;
+    final double lng = incident.mapLongitude;
+    if (lat == 0 && lng == 0) return;
+    if (!_mapController.isCompleted) return;
+    final GoogleMapController controller = await _mapController.future;
+    if (!mounted) return;
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(lat, lng), zoom: 15)),
+    );
+  }
+
+  void _openSelectedDetail() {
+    final Incident? i = _selectedMapIncident;
+    if (i == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => IncidentDetailScreen(incident: i)),
+    );
+  }
+
+  void _dismissPeek() => setState(() => _selectedMapIncident = null);
+
   Future<void> _onPlaceSelected(SelectedPlace place) async {
+    setState(() => _selectedMapIncident = null);
     final LatLng target = LatLng(place.latitude, place.longitude);
     setState(() {
       _searchMarker = Marker(
@@ -127,6 +190,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
       return;
     }
     setState(() {
+      _selectedMapIncident = null;
       _currentPosition = position;
       _locationReady = true;
     });
@@ -172,6 +236,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
       maxLng = maxLng > incident.longitude ? maxLng : incident.longitude;
     }
 
+    setState(() => _selectedMapIncident = null);
     await controller.animateCamera(
       CameraUpdate.newLatLngBounds(LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng)), 80),
     );
@@ -244,6 +309,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
     }
   ]
   ''',
+            onTap: (_) => _dismissPeek(),
             onMapCreated: (GoogleMapController controller) {
               if (!_mapController.isCompleted) {
                 _mapController.complete(controller);
@@ -256,6 +322,17 @@ class _MapTabScreenState extends State<MapTabScreen> {
             right: AppDimens.space12,
             child: MapSearchBar(onPlaceSelected: _onPlaceSelected),
           ),
+          if (_selectedMapIncident != null)
+            Positioned(
+              left: AppDimens.space12,
+              right: AppDimens.space12,
+              bottom: 168 + MediaQuery.paddingOf(context).bottom,
+              child: MapIncidentPeekCard(
+                incident: _selectedMapIncident!,
+                onSeeDetails: _openSelectedDetail,
+                onDismiss: _dismissPeek,
+              ),
+            ),
           if (incidents.mapEventsLoading)
             Positioned(
               left: 0,

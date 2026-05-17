@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_list_screen.dart';
+import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/features/map/map_tab_screen.dart';
 import 'package:google_hackathon_app/features/status/status_screen.dart';
 import 'package:google_hackathon_app/features/submit/submit_incident_screen.dart';
@@ -17,16 +18,31 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _index = 0;
+  final IncidentsController _incidents = IncidentsController();
+
+  @override
+  void dispose() {
+    _incidents.dispose();
+    super.dispose();
+  }
+
+  void _openIncidentOnMap(Incident incident) {
+    _incidents.requestMapFocus(incident);
+    setState(() => _index = 1);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<IncidentsController>(
-      create: (_) => IncidentsController(),
+    return ChangeNotifierProvider<IncidentsController>.value(
+      value: _incidents,
       child: Scaffold(
         body: IndexedStack(
           index: _index,
           children: [
-            IncidentsListScreen(onLogout: widget.onLogout),
+            IncidentsListScreen(
+              onLogout: widget.onLogout,
+              onOpenIncidentOnMap: _openIncidentOnMap,
+            ),
             const MapTabScreen(),
             const StatusScreen(),
             const SubmitIncidentScreen(),

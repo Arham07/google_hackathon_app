@@ -10,9 +10,10 @@ import 'package:google_hackathon_app/widgets/incident_card.dart';
 import 'package:provider/provider.dart';
 
 class IncidentsListScreen extends StatefulWidget {
-  const IncidentsListScreen({super.key, this.onLogout});
+  const IncidentsListScreen({super.key, this.onLogout, this.onOpenIncidentOnMap});
 
   final VoidCallback? onLogout;
+  final void Function(Incident incident)? onOpenIncidentOnMap;
 
   @override
   State<IncidentsListScreen> createState() => _IncidentsListScreenState();
@@ -216,6 +217,9 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                 ),
               );
             },
+            onOpenOnMap: widget.onOpenIncidentOnMap == null || !incident.hasMapCoordinates
+                ? null
+                : () => widget.onOpenIncidentOnMap!(incident),
           );
         },
       ),

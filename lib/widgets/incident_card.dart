@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_hackathon_app/config/app_assets.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
@@ -6,10 +7,16 @@ import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
 
 class IncidentCard extends StatelessWidget {
-  const IncidentCard({super.key, required this.incident, required this.onTap});
+  const IncidentCard({
+    super.key,
+    required this.incident,
+    required this.onTap,
+    this.onOpenOnMap,
+  });
 
   final Incident incident;
   final VoidCallback onTap;
+  final VoidCallback? onOpenOnMap;
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +36,40 @@ class IncidentCard extends StatelessWidget {
       child: Material(
         color: bgColor,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              border: Border.all(color: borderColor),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ClipRRect(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(AppDimens.radiusMd),
+                ),
+                child: ClipRRect(
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(AppDimens.radiusMd),
                   ),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: incident.thumbnailUrl != null
-                        ? Image.network(incident.thumbnailUrl!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => _placeholderImage())
-                        : _placeholderImage(),
+                        ? Image.network(
+                            incident.thumbnailUrl!,
+                            fit: BoxFit.cover,
+                          errorBuilder:
+                              (BuildContext context, Object error, StackTrace? stackTrace) =>
+                                  _fallbackThumbnail(),
+                          )
+                        : _fallbackThumbnail(),
                   ),
                 ),
-                Padding(
+              ),
+              InkWell(
+                onTap: onTap,
+                child: Padding(
                   padding: EdgeInsets.all(AppDimens.space14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,14 +119,20 @@ class IncidentCard extends StatelessWidget {
                           ),
                           SizedBox(width: AppDimens.space4),
                           Expanded(
-                            child: Text(incident.locationLabel, style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground)),
+                            child: Text(
+                              incident.locationLabel,
+                              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
+                            ),
                           ),
                         ],
                       ),
                       SizedBox(height: AppDimens.space8),
                       Text(
                         incident.authenticity.label,
-                        style: theme.textTheme.labelSmall?.copyWith(color: AppColors.chart2, fontStyle: FontStyle.italic),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppColors.chart2,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                       SizedBox(height: AppDimens.space8),
                       Text(
@@ -117,18 +141,42 @@ class IncidentCard extends StatelessWidget {
                           color: AppColors.mutedForeground,
                         ),
                       ),
+                      if (onOpenOnMap != null && incident.hasMapCoordinates) ...[
+                        SizedBox(height: AppDimens.space10),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: onOpenOnMap,
+                            icon: Icon(
+                              Icons.map_outlined,
+                              size: AppDimens.iconSm,
+                              color: AppColors.mapAccent,
+                            ),
+                            label: const Text('Show on map'),
+                            style: TextButton.styleFrom(foregroundColor: AppColors.mapAccent),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _placeholderImage() {
+  Widget _fallbackThumbnail() {
+    return Image.asset(
+      AppAssets.incidentThumbnailPlaceholder,
+      fit: BoxFit.cover,
+      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) => _iconPlaceholder(),
+    );
+  }
+
+  Widget _iconPlaceholder() {
     return Container(
       color: AppColors.surfaceElevated,
       child: Center(

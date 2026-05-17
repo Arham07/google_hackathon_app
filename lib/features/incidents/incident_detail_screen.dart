@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_hackathon_app/config/app_assets.dart';
 import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/events_api.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
@@ -212,6 +213,14 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
   }
 
   Widget _placeholderImage() {
+    return Image.asset(
+      AppAssets.incidentThumbnailPlaceholder,
+      fit: BoxFit.cover,
+      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) => _iconPlaceholder(),
+    );
+  }
+
+  Widget _iconPlaceholder() {
     return Container(
       color: AppColors.surfaceElevated,
       child: Center(
