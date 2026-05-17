@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Zinc-950 surfaces, blue map accent, glass panels.
 abstract final class AppColors {
   // Core surfaces — oklch(0.145 0 0) ≈ zinc-950 (#09090b)
-  static const Color background = Color(0xFF09090B);
+  static final Color background = const Color(0xFF212121);
   static const Color foreground = Color(0xFFFAFAFA);
   static const Color card = Color(0xFF09090B);
   static const Color cardForeground = Color(0xFFFAFAFA);
