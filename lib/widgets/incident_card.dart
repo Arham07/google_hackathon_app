@@ -117,22 +117,6 @@ class IncidentCard extends StatelessWidget {
                           color: AppColors.mutedForeground,
                         ),
                       ),
-                      SizedBox(height: AppDimens.space12),
-                      Row(
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: onTap,
-                            icon: Icon(Icons.info_outline, size: AppDimens.iconMd),
-                            label: const Text('Details'),
-                          ),
-                          SizedBox(width: AppDimens.space8),
-                          FilledButton.tonalIcon(
-                            onPressed: onTap,
-                            icon: Icon(Icons.map_outlined, size: AppDimens.iconMd),
-                            label: const Text('Map'),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),

@@ -164,28 +164,37 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 items: _precautionsToShow,
                 isPlaceholder: _incident.precautions.isEmpty,
               ),
-              SizedBox(height: AppDimens.space24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _incident.hasMapCoordinates
-                      ? () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => IncidentMapScreen(
-                                latitude: _incident.mapLatitude,
-                                longitude: _incident.mapLongitude,
-                                title: _incident.title,
-                              ),
-                            ),
-                          );
-                        }
-                      : null,
-                  icon: const Icon(Icons.map_outlined),
-                  label: const Text('Open on map'),
-                ),
-              ),
             ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        backgroundColor: Colors.blue,
+        onPressed: _incident.hasMapCoordinates
+            ? () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => IncidentMapScreen(
+                latitude: _incident.mapLatitude,
+                longitude: _incident.mapLongitude,
+                title: _incident.title,
+              ),
+            ),
+          );
+        }
+            : null,
+        icon: const Icon(
+          Icons.map,
+          color: Colors.white,
+        ),
+        label: const Text(
+          'Open on Map',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
