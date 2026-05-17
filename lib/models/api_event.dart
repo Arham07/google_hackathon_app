@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:google_hackathon_app/config/api_config.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
@@ -46,19 +48,16 @@ Incident incidentFromApiJson(Map<String, dynamic> json) {
 
 /// Enrich [incident] from a full `view=full` row when available.
 Incident mergeFullEvent(Incident incident, Map<String, dynamic> full) {
-  final Map<String, dynamic>? payload =
-      full['payload'] is Map ? Map<String, dynamic>.from(full['payload'] as Map) : null;
+  final Map<String, dynamic>? payload = _resolvePayload(full);
 
   final String summary = full['ai_summary'] as String? ??
       payload?['display_reasoning']?.toString() ??
       incident.summary;
 
-  final List<String> precautions = _stringList(payload?['precautions']) ??
-      _stringList(full['precautions']) ??
+  final List<String> precautions = _extractPrecautions(full, payload) ??
       incident.precautions;
 
-  final List<String> resources = _stringList(payload?['resources']) ??
-      _stringList(full['assigned_assets']) ??
+  final List<String> resources = _extractResources(full, payload) ??
       incident.resources;
 
   return Incident(
@@ -138,7 +137,60 @@ DateTime _parseDateTime(dynamic value) {
 
 List<String>? _stringList(dynamic value) {
   if (value is List) {
-    return value.map((dynamic e) => e.toString()).toList();
+    final List<String> items = value
+        .map((dynamic e) => e.toString().trim())
+        .where((String s) => s.isNotEmpty)
+        .toList();
+    return items.isEmpty ? null : items;
+  }
+  if (value is String && value.trim().isNotEmpty) {
+    return <String>[value.trim()];
   }
   return null;
+}
+
+Map<String, dynamic>? _resolvePayload(Map<String, dynamic> full) {
+  final dynamic raw = full['payload'];
+  if (raw is Map<String, dynamic>) return raw;
+  if (raw is Map) return Map<String, dynamic>.from(raw);
+  if (raw is String && raw.trim().startsWith('{')) {
+    try {
+      final dynamic decoded = jsonDecode(raw);
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (_) {}
+  }
+  return null;
+}
+
+List<String>? _extractPrecautions(
+  Map<String, dynamic> full,
+  Map<String, dynamic>? payload,
+) {
+  final Map<String, dynamic>? p = payload ?? _resolvePayload(full);
+
+  final List<String>? fromBullets = _stringList(p?['display_reasoning']);
+  if (fromBullets != null && fromBullets.isNotEmpty) return fromBullets;
+
+  final String? peopleSafety = p?['people_safety'] as String? ??
+      full['people_safety'] as String?;
+  if (peopleSafety != null && peopleSafety.trim().isNotEmpty) {
+    return <String>[peopleSafety.trim()];
+  }
+
+  return _stringList(p?['precautions']) ?? _stringList(full['precautions']);
+}
+
+List<String>? _extractResources(
+  Map<String, dynamic> full,
+  Map<String, dynamic>? payload,
+) {
+  final Map<String, dynamic>? p = payload ?? _resolvePayload(full);
+
+  final List<String>? assets = _stringList(p?['assigned_assets']) ??
+      _stringList(full['assigned_assets']);
+  if (assets != null && assets.isNotEmpty) {
+    return assets.where((String a) => a != 'SYSTEM_UPDATE').toList();
+  }
+
+  return _stringList(p?['resources']) ?? _stringList(full['resources']);
 }

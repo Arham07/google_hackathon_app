@@ -28,6 +28,32 @@ void main() {
     });
   });
 
+  group('mergeFullEvent', () {
+    test('extracts display_reasoning and assigned_assets from payload', () {
+      final Incident base = incidentFromApiJson(<String, dynamic>{
+        'event_id': 'EVT-1',
+        'category': 'Test',
+        'priority': 'HIGH',
+        'lat': 24.0,
+        'lng': 67.0,
+        'scan_datetime': '2026-05-17T12:00:00Z',
+      });
+
+      final Incident merged = mergeFullEvent(base, <String, dynamic>{
+        'payload': <String, dynamic>{
+          'display_reasoning': <String>[
+            'Avoid flooded roads',
+            'Do not cross standing water',
+          ],
+          'assigned_assets': <String>['PDMA Sindh', 'KMC rescue'],
+        },
+      });
+
+      expect(merged.precautions, hasLength(2));
+      expect(merged.resources, contains('PDMA Sindh'));
+    });
+  });
+
   group('priority helpers', () {
     test('sorts CRITICAL before LOW', () {
       final List<Incident> list = <Incident>[

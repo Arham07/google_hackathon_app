@@ -1,15 +1,25 @@
 import 'package:dio/dio.dart';
 import 'package:google_hackathon_app/config/api_config.dart';
 import 'package:google_hackathon_app/core/api/api_exception.dart';
+import 'package:google_hackathon_app/core/api/api_logging_interceptor.dart';
 
-/// Shared Dio wrapper — no interceptors, no auth headers (open APIs).
+/// Shared Dio wrapper — open APIs (no auth). Includes debug logging interceptor.
 class ApiClient {
-  ApiClient({Dio? dio, String? baseUrl}) : _dio = dio ?? _createDio(baseUrl);
+  ApiClient({Dio? dio, String? baseUrl, bool enableLogging = true})
+      : _dio = dio ?? _createDio(baseUrl, enableLogging: enableLogging) {
+    if (dio != null && enableLogging && !_hasLoggingInterceptor(dio)) {
+      dio.interceptors.add(ApiLoggingInterceptor());
+    }
+  }
 
   final Dio _dio;
 
-  static Dio _createDio(String? baseUrl) {
-    return Dio(
+  static bool _hasLoggingInterceptor(Dio dio) {
+    return dio.interceptors.any((Interceptor i) => i is ApiLoggingInterceptor);
+  }
+
+  static Dio _createDio(String? baseUrl, {bool enableLogging = true}) {
+    final Dio dio = Dio(
       BaseOptions(
         baseUrl: baseUrl ?? ApiConfig.baseUrl,
         connectTimeout: ApiConfig.connectTimeout,
@@ -17,6 +27,10 @@ class ApiClient {
         headers: const <String, String>{'Accept': 'application/json'},
       ),
     );
+    if (enableLogging) {
+      dio.interceptors.add(ApiLoggingInterceptor());
+    }
+    return dio;
   }
 
   Future<Map<String, dynamic>> get(

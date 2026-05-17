@@ -19,16 +19,24 @@ class IncidentDetailScreen extends StatefulWidget {
 
 class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
   final EventsApi _eventsApi = EventsApi();
-  Incident? _incident;
+  late Incident _incident;
   bool _loadingExtra = false;
+
+  static const List<String> _placeholderPrecautions = <String>[
+    'No specific precautions have been published for this incident yet.',
+    'Stay alert and follow guidance from local authorities and emergency services.',
+  ];
+
+  static const List<String> _placeholderResources = <String>[
+    'No dedicated resources are listed for this incident.',
+    'For emergencies in Pakistan, call 1122 or PDMA Sindh helpline 1099.',
+  ];
 
   @override
   void initState() {
     super.initState();
     _incident = widget.incident;
-    if (widget.incident.precautions.isEmpty && widget.incident.resources.isEmpty) {
-      _loadFull();
-    }
+    _loadFull();
   }
 
   Future<void> _loadFull() async {
@@ -36,22 +44,27 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     try {
       final Map<String, dynamic>? full =
           await _eventsApi.fetchById(widget.incident.id);
-      if (!mounted || full == null) return;
-      setState(() {
+      if (!mounted) return;
+      if (full != null) {
         _incident = mergeFullEvent(widget.incident, full);
-        _loadingExtra = false;
-      });
+      }
     } on ApiException {
-      if (mounted) setState(() => _loadingExtra = false);
+      // Keep list-row data; placeholders still shown below.
     } catch (_) {
+      // Ignore — placeholders cover empty state.
+    } finally {
       if (mounted) setState(() => _loadingExtra = false);
     }
   }
 
+  List<String> get _precautionsToShow =>
+      _incident.precautions.isNotEmpty ? _incident.precautions : _placeholderPrecautions;
+
+  List<String> get _resourcesToShow =>
+      _incident.resources.isNotEmpty ? _incident.resources : _placeholderResources;
+
   @override
   Widget build(BuildContext context) {
-    final Incident incident = _incident ?? widget.incident;
-
     return Scaffold(
       appBar: AppBar(title: const Text('Incident details')),
       body: SingleChildScrollView(
@@ -63,9 +76,9 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               borderRadius: BorderRadius.circular(AppColors.radius),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: incident.thumbnailUrl != null
+                child: _incident.thumbnailUrl != null
                     ? Image.network(
-                        incident.thumbnailUrl!,
+                        _incident.thumbnailUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             _placeholderImage(),
@@ -76,11 +89,11 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                PriorityChip(priority: incident.priority),
+                PriorityChip(priority: _incident.priority),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    incident.authenticity.label,
+                    _incident.authenticity.label,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: AppColors.chart2,
                           fontStyle: FontStyle.italic,
@@ -91,20 +104,20 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              incident.title,
+              _incident.title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              incident.locationLabel,
+              _incident.locationLabel,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.mutedForeground,
                   ),
             ),
             Text(
-              DateFormat('dd MMM yyyy, HH:mm').format(incident.scanDatetime),
+              DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: AppColors.mutedForeground,
                   ),
@@ -116,25 +129,23 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 child: LinearProgressIndicator(minHeight: 2),
               ),
             Text(
-              incident.summary,
+              _incident.summary,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            if (incident.precautions.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              _Section(
-                title: 'Precautions',
-                icon: Icons.warning_amber_rounded,
-                items: incident.precautions,
-              ),
-            ],
-            if (incident.resources.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              _Section(
-                title: 'Resources',
-                icon: Icons.medical_services_outlined,
-                items: incident.resources,
-              ),
-            ],
+            const SizedBox(height: 24),
+            _Section(
+              title: 'Precautions',
+              icon: Icons.warning_amber_rounded,
+              items: _precautionsToShow,
+              isPlaceholder: _incident.precautions.isEmpty,
+            ),
+            const SizedBox(height: 16),
+            _Section(
+              title: 'Resources',
+              icon: Icons.medical_services_outlined,
+              items: _resourcesToShow,
+              isPlaceholder: _incident.resources.isEmpty,
+            ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -143,9 +154,9 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => IncidentMapScreen(
-                        latitude: incident.latitude,
-                        longitude: incident.longitude,
-                        title: incident.title,
+                        latitude: _incident.latitude,
+                        longitude: _incident.longitude,
+                        title: _incident.title,
                       ),
                     ),
                   );
@@ -175,11 +186,13 @@ class _Section extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.items,
+    this.isPlaceholder = false,
   });
 
   final String title;
   final IconData icon;
   final List<String> items;
+  final bool isPlaceholder;
 
   @override
   Widget build(BuildContext context) {
@@ -212,8 +225,19 @@ class _Section extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: AppColors.mutedForeground)),
-                  Expanded(child: Text(item)),
+                  if (!isPlaceholder)
+                    const Text('• ', style: TextStyle(color: AppColors.mutedForeground)),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: isPlaceholder
+                          ? Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.mutedForeground,
+                                fontStyle: FontStyle.italic,
+                              )
+                          : null,
+                    ),
+                  ),
                 ],
               ),
             ),
