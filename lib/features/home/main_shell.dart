@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
+import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/widgets/glass_surface.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_list_screen.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/features/map/map_tab_screen.dart';
@@ -65,10 +68,20 @@ class _MainShellState extends State<MainShell> {
           const SubmitIncidentScreen(),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (int i) => setState(() => _index = i),
-        destinations: const [
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radiusLg)),
+        child: GlassSurface(
+          blur: true,
+          sigma: GlassDefaults.sigmaChrome,
+          color: AppColors.glassFillStrong.withValues(alpha: 0.92),
+          borderRadius: 0,
+          border: const Border(
+            top: BorderSide(color: AppColors.glassBorderHighlight),
+          ),
+          child: NavigationBar(
+            selectedIndex: _index,
+            onDestinationSelected: (int i) => setState(() => _index = i),
+            destinations: const [
             NavigationDestination(
               icon: Icon(Icons.list_alt_outlined),
               selectedIcon: Icon(Icons.list_alt),
@@ -89,7 +102,9 @@ class _MainShellState extends State<MainShell> {
               selectedIcon: Icon(Icons.add_circle),
               label: 'Report',
             ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

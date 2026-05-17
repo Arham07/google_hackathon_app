@@ -8,6 +8,7 @@ import 'package:google_hackathon_app/models/api_event.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/external_url.dart';
+import 'package:google_hackathon_app/widgets/glass_surface.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -415,13 +416,9 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassCard(
+      blur: false,
       padding: EdgeInsets.all(AppDimens.space16),
-      decoration: BoxDecoration(
-        color: AppColors.glassPanel,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -455,13 +452,9 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassCard(
+      blur: false,
       padding: EdgeInsets.all(AppDimens.space16),
-      decoration: BoxDecoration(
-        color: AppColors.glassPanel,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

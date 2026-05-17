@@ -6,6 +6,7 @@ import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
+import 'package:google_hackathon_app/widgets/glass_surface.dart';
 import 'package:google_hackathon_app/widgets/incident_card.dart';
 import 'package:provider/provider.dart';
 
@@ -63,7 +64,10 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               AppDimens.space16,
               0,
             ),
-            child: SegmentedButton<IncidentListMode>(
+            child: GlassCard(
+              blur: false,
+              padding: EdgeInsets.all(AppDimens.space8),
+              child: SegmentedButton<IncidentListMode>(
               segments: const [
                 ButtonSegment(
                   value: IncidentListMode.nearby,
@@ -86,6 +90,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                 if (selected.isEmpty) return;
                 controller.setMode(selected.first);
               },
+            ),
             ),
           ),
           SizedBox(height: AppDimens.space8),

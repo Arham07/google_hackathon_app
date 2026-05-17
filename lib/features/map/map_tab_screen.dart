@@ -9,6 +9,7 @@ import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/alert_marker_icon.dart';
+import 'package:google_hackathon_app/widgets/glass_surface.dart';
 import 'package:google_hackathon_app/widgets/map_incident_peek_card.dart';
 import 'package:google_hackathon_app/widgets/map_search_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -346,18 +347,16 @@ class _MapTabScreenState extends State<MapTabScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            heroTag: 'map_my_location',
-            tooltip: 'My location',
+          GlassFab(
             onPressed: _goToMyLocation,
             child: const Icon(Icons.my_location),
           ),
           SizedBox(height: AppDimens.space12),
-          FloatingActionButton.extended(
-            heroTag: 'map_all_alerts',
+          GlassFab(
+            extended: true,
+            label: 'Show all alerts',
             onPressed: canShowAllAlerts ? _fitAllAlerts : null,
-            label: const Text('Show all alerts'),
-            icon: const Icon(Icons.warning_amber_rounded),
+            child: const Icon(Icons.warning_amber_rounded),
           ),
         ],
       ),

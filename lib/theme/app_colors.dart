@@ -12,7 +12,7 @@ abstract final class AppColors {
   static const Color card = surfaceElevated;
   static const Color cardForeground = foreground;
 
-  /// Glass fills — use with [LiquidGlassSettings.glassColor] (ARGB alpha = strength).
+  /// Glass fills — semi-transparent tints for frosted panels (ARGB alpha = strength).
   static const Color glassFill = Color(0x66040814);
   static const Color glassFillStrong = Color(0x99040814);
 
