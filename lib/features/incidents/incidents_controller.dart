@@ -22,10 +22,18 @@ class IncidentsController extends ChangeNotifier {
   final Set<IncidentPriority> activePriorityFilters = <IncidentPriority>{};
 
   List<Incident> _allIncidents = <Incident>[];
+  List<Incident> mapEvents = <Incident>[];
   NearestAreaInfo? nearestArea;
 
   bool isLoading = false;
+  bool mapEventsLoading = false;
   String? errorMessage;
+  String? mapEventsError;
+
+  /// Incidents with valid coordinates for map markers.
+  List<Incident> get mapEventsWithCoordinates => mapEvents
+      .where((Incident i) => i.latitude != 0 || i.longitude != 0)
+      .toList();
 
   List<Incident> get visibleIncidents {
     List<Incident> list = List<Incident>.from(_allIncidents);
@@ -78,6 +86,28 @@ class IncidentsController extends ChangeNotifier {
   void clearPriorityFilters() {
     activePriorityFilters.clear();
     notifyListeners();
+  }
+
+  /// Loads all events for the map tab (`GET /api/events`), independent of list mode.
+  Future<void> loadMapEvents() async {
+    mapEventsLoading = true;
+    mapEventsError = null;
+    notifyListeners();
+
+    try {
+      final EventsListResponse response = await _eventsApi.fetchAll();
+      mapEvents = incidentsFromApiList(response.events);
+      mapEventsError = null;
+    } on ApiException catch (e) {
+      mapEventsError = e.message;
+      mapEvents = <Incident>[];
+    } catch (_) {
+      mapEventsError = 'Failed to load map alerts';
+      mapEvents = <Incident>[];
+    } finally {
+      mapEventsLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<EventsListResponse> _fetchForMode() async {
