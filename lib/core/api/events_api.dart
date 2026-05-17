@@ -1,5 +1,6 @@
 import 'package:google_hackathon_app/config/api_config.dart';
 import 'package:google_hackathon_app/core/api/api_client.dart';
+import 'package:google_hackathon_app/core/api/api_endpoints.dart';
 
 class NearestAreaInfo {
   const NearestAreaInfo({
@@ -51,7 +52,7 @@ class EventsApi {
     int limit = ApiConfig.eventsLimit,
   }) async {
     final Map<String, dynamic> body = await _client.get(
-      '/api/events',
+      ApiEndpoints.events,
       queryParameters: <String, dynamic>{
         'city': city,
         'limit': limit,
@@ -67,7 +68,7 @@ class EventsApi {
     int limit = ApiConfig.eventsLimit,
   }) async {
     final Map<String, dynamic> body = await _client.get(
-      '/api/events/nearest',
+      ApiEndpoints.eventsNearest,
       queryParameters: <String, dynamic>{
         'city': city,
         'lat': lat,
@@ -87,7 +88,7 @@ class EventsApi {
 
   Future<Map<String, dynamic>?> fetchById(String eventId) async {
     final Map<String, dynamic> body = await _client.get(
-      '/api/events',
+      ApiEndpoints.events,
       queryParameters: <String, dynamic>{
         'event_id': eventId,
         'view': 'full',

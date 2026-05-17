@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_hackathon_app/config/api_config.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/models/api_event.dart';
 
@@ -25,6 +26,63 @@ void main() {
       expect(incident.summary, 'Water logging reported');
       expect(incident.isUserSubmitted, isTrue);
       expect(incident.locationLabel, contains('Malir Cantonment'));
+    });
+
+    test('resolves relative thumbnail with base URL', () {
+      final Incident incident = incidentFromApiJson(<String, dynamic>{
+        'event_id': 'EVT-2',
+        'category': 'Flood',
+        'priority': 'HIGH',
+        'lat': 24.0,
+        'lng': 67.0,
+        'scan_datetime': '2026-05-17T12:00:00Z',
+        'thumbnail': '/event-thumbnails/sample.jpg',
+      });
+
+      expect(
+        incident.thumbnailUrl,
+        '${ApiConfig.baseUrl}/event-thumbnails/sample.jpg',
+      );
+    });
+
+    test('parses source_trail weather and news', () {
+      final Incident incident = incidentFromApiJson(<String, dynamic>{
+        'event_id': 'EVT-3',
+        'category': 'Causeway',
+        'priority': 'LOW',
+        'lat': 24.82,
+        'lng': 67.09,
+        'scan_datetime': '2026-05-17T12:00:00Z',
+        'event_tags': <String>['roadblockage', 'weather'],
+        'status': 'TRIAGED',
+        'source_trail': <Map<String, dynamic>>[
+          <String, dynamic>{
+            'type': 'news',
+            'json_dump_response': <Map<String, dynamic>>[
+              <String, dynamic>{
+                'headline': 'Causeway closed',
+                'url': 'https://example.com/story',
+              },
+            ],
+          },
+          <String, dynamic>{
+            'type': 'weather',
+            'json_dump_response': <String, dynamic>{
+              'current': <String, dynamic>{
+                'temp_c': 32.3,
+                'condition': 'Sunny',
+              },
+            },
+          },
+        ],
+      });
+
+      expect(incident.status, 'TRIAGED');
+      expect(incident.eventTags, contains('roadblockage'));
+      expect(incident.sourceTrail, hasLength(2));
+      expect(incident.sourceTrail.first.newsArticles.first.headline, 'Causeway closed');
+      expect(incident.sourceTrail.last.weather?.tempC, 32.3);
+      expect(incident.hasMapCoordinates, isTrue);
     });
   });
 

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:google_hackathon_app/core/api/api_client.dart';
+import 'package:google_hackathon_app/core/api/api_endpoints.dart';
 
 class UserReportSubmitResponse {
   const UserReportSubmitResponse({
@@ -58,7 +59,7 @@ class UserReportsApi {
     });
 
     final Map<String, dynamic> body = await _client.postMultipart(
-      '/api/user-reports/submit',
+      ApiEndpoints.userReportsSubmit,
       formData: formData,
     );
 
