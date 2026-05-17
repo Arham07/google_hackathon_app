@@ -5,7 +5,6 @@ import 'package:google_hackathon_app/features/incidents/data/mock_incidents.dart
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
-import 'package:google_hackathon_app/widgets/glass_surface.dart';
 
 class StatusScreen extends StatelessWidget {
   const StatusScreen({super.key});
@@ -93,9 +92,13 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassCard(
-      blur: false,
+    return Container(
       padding: EdgeInsets.all(AppDimens.space16),
+      decoration: BoxDecoration(
+        color: AppColors.glassPanel,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
       child: Row(
         children: [
           Container(

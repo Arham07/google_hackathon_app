@@ -5,7 +5,6 @@ import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/incident_time_format.dart';
-import 'package:google_hackathon_app/widgets/glass_surface.dart';
 import 'package:google_hackathon_app/widgets/incident_live_beacon.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
@@ -27,11 +26,15 @@ class IncidentCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppDimens.space16, vertical: AppDimens.space6),
-      child: GlassCard(
-        blur: false,
+      child: Material(
         color: bgColor,
-        border: Border.all(color: borderColor, width: isRecent ? 1.5 : 1),
-        child: Column(
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(color: borderColor, width: isRecent ? 1.5 : 1),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InkWell(
@@ -209,6 +212,7 @@ class IncidentCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
       ),
     );
   }

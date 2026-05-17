@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 
@@ -16,16 +15,9 @@ class PriorityChip extends StatelessWidget {
         vertical: AppDimens.space4,
       ),
       decoration: BoxDecoration(
-        color: priority.backgroundColor.withValues(alpha: 0.85),
+        color: priority.backgroundColor,
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        border: Border.all(color: priority.color.withValues(alpha: 0.55)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.glassBorderHighlight.withValues(alpha: 0.06),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        border: Border.all(color: priority.color.withValues(alpha: 0.5)),
       ),
       child: Text(
         priority.label,

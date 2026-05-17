@@ -55,19 +55,19 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.glassFill,
+        fillColor: AppColors.surfaceOverlay,
         hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          borderSide: const BorderSide(color: AppColors.glassBorder),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          borderSide: const BorderSide(color: AppColors.glassBorder),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          borderSide: BorderSide(color: AppColors.glassBorderHighlight, width: 1.5.w),
+          borderSide: BorderSide(color: AppColors.mapAccent, width: 1.5.w),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
@@ -94,19 +94,15 @@ abstract final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.foreground,
-          side: const BorderSide(color: AppColors.glassBorderHighlight),
+          side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           ),
         ),
       ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.mapAccent),
-      ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        indicatorColor: AppColors.glassFill,
+        backgroundColor: AppColors.surfaceElevated,
+        indicatorColor: AppColors.surfaceOverlay,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return textTheme.labelSmall?.copyWith(
@@ -125,7 +121,7 @@ abstract final class AppTheme {
       ),
       dividerTheme: const DividerThemeData(color: AppColors.border, thickness: 1),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.glassFillStrong,
+        backgroundColor: AppColors.surfaceElevated,
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: AppColors.foreground),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(

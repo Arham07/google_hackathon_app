@@ -3,7 +3,6 @@ import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/auth/signup_screen.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
-import 'package:google_hackathon_app/widgets/glass_surface.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLoggedIn});
@@ -70,13 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                 ),
                 SizedBox(height: AppDimens.space40),
-                GlassCard(
-                  blur: true,
-                  sigma: GlassDefaults.sigmaChrome,
-                  padding: EdgeInsets.all(AppDimens.space20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -130,9 +122,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                   child: const Text('Create an account'),
-                ),
-                    ],
-                  ),
                 ),
               ],
             ),

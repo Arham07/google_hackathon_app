@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
-import 'package:google_hackathon_app/widgets/glass_surface.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.onSignedUp});
@@ -56,13 +55,6 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                 ),
                 SizedBox(height: AppDimens.space24),
-                GlassCard(
-                  blur: true,
-                  sigma: GlassDefaults.sigmaChrome,
-                  padding: EdgeInsets.all(AppDimens.space20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
@@ -132,9 +124,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ElevatedButton(
                   onPressed: _submit,
                   child: const Text('Sign up'),
-                ),
-                    ],
-                  ),
                 ),
               ],
             ),

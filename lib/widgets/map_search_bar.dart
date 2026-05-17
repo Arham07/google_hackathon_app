@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/config/maps_config.dart';
 import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/places_search_service.dart';
+import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
-import 'package:google_hackathon_app/widgets/glass_surface.dart';
 
 class MapSearchBar extends StatefulWidget {
   const MapSearchBar({
@@ -136,10 +136,11 @@ class _MapSearchBarState extends State<MapSearchBar> {
     final bool showList =
         _suggestions.isNotEmpty || _isSearching || _error != null;
 
-    return GlassCard(
-      blur: true,
-      sigma: GlassDefaults.sigmaChrome,
-      borderRadius: AppDimens.radiusLg,
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+      clipBehavior: Clip.antiAlias,
+      color: AppColors.surfaceElevated,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
