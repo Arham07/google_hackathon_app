@@ -21,7 +21,7 @@ abstract final class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: ColorScheme.dark(
-        surface: AppColors.background,
+        surface: AppColors.surface,
         onSurface: AppColors.foreground,
         primary: AppColors.primary,
         onPrimary: AppColors.primaryForeground,
@@ -42,11 +42,11 @@ abstract final class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.glassPanel,
+        color: AppColors.glassFillStrong,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          side: const BorderSide(color: AppColors.tacticalBorder),
+          side: const BorderSide(color: AppColors.glassBorder),
         ),
         margin: EdgeInsets.symmetric(
           horizontal: AppDimens.space16,
@@ -55,7 +55,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.input,
+        fillColor: AppColors.surfaceOverlay,
         hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
@@ -101,8 +101,8 @@ abstract final class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.background,
-        indicatorColor: AppColors.surfaceElevated,
+        backgroundColor: Colors.transparent,
+        indicatorColor: AppColors.surfaceOverlay,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return textTheme.labelSmall?.copyWith(

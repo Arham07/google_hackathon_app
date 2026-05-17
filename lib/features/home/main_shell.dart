@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
+import 'package:google_hackathon_app/theme/app_liquid_glass.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_list_screen.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/features/map/map_tab_screen.dart';
@@ -65,31 +67,35 @@ class _MainShellState extends State<MainShell> {
           const SubmitIncidentScreen(),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (int i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.list_alt_outlined),
-            selectedIcon: Icon(Icons.list_alt),
-            label: 'Incidents',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Status',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.add_circle_outline),
-            selectedIcon: Icon(Icons.add_circle),
-            label: 'Report',
-          ),
-        ],
+      bottomNavigationBar: LiquidGlassLayer(
+        fake: true,
+        settings: AppLiquidGlass.navBar,
+        child: NavigationBar(
+          selectedIndex: _index,
+          onDestinationSelected: (int i) => setState(() => _index = i),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.list_alt_outlined),
+              selectedIcon: Icon(Icons.list_alt),
+              label: 'Incidents',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.map_outlined),
+              selectedIcon: Icon(Icons.map),
+              label: 'Map',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bar_chart_outlined),
+              selectedIcon: Icon(Icons.bar_chart),
+              label: 'Status',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.add_circle_outline),
+              selectedIcon: Icon(Icons.add_circle),
+              label: 'Report',
+            ),
+          ],
+        ),
       ),
     );
   }
