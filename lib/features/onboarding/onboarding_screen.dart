@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.onFinished});
@@ -75,14 +76,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(AppDimens.space24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(2, (int i) {
                   return Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: AppDimens.space8,
+                    height: AppDimens.space8,
+                    margin: EdgeInsets.symmetric(horizontal: AppDimens.space4),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: _page == i
@@ -94,7 +95,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              padding: EdgeInsets.fromLTRB(
+                AppDimens.space24,
+                0,
+                AppDimens.space24,
+                AppDimens.space24,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -123,13 +129,16 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.space32,
+        vertical: AppDimens.space24,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 72, color: AppColors.mapAccent),
-          const SizedBox(height: 32),
+          Icon(icon, size: AppDimens.iconOnboarding, color: AppColors.mapAccent),
+          SizedBox(height: AppDimens.space32),
           Text(
             title,
             textAlign: TextAlign.center,
@@ -137,7 +146,7 @@ class _OnboardingPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimens.space16),
           Text(
             body,
             textAlign: TextAlign.center,

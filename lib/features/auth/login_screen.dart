@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/auth/signup_screen.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLoggedIn});
@@ -39,15 +40,19 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(AppDimens.space24),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
-                const Icon(Icons.emergency_outlined, size: 56, color: AppColors.mapAccent),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space40),
+                Icon(
+                  Icons.emergency_outlined,
+                  size: AppDimens.iconHero,
+                  color: AppColors.mapAccent,
+                ),
+                SizedBox(height: AppDimens.space16),
                 Text(
                   'CIRO Alerts',
                   textAlign: TextAlign.center,
@@ -55,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: AppDimens.space8),
                 Text(
                   'Sign in to continue (demo — any valid email works)',
                   textAlign: TextAlign.center,
@@ -63,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppColors.mutedForeground,
                       ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: AppDimens.space40),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -81,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space16),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscure,
@@ -102,12 +107,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: AppDimens.space32),
                 ElevatedButton(
                   onPressed: _submit,
                   child: const Text('Sign in'),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space16),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).push(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/auth/login_screen.dart';
 import 'package:google_hackathon_app/features/home/main_shell.dart';
@@ -46,17 +47,24 @@ class _CiroAppState extends State<CiroApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CIRO Alerts',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      home: switch (_gate) {
-        _AppGate.loading => const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          ),
-        _AppGate.onboarding => OnboardingScreen(onFinished: _goLogin),
-        _AppGate.login => LoginScreen(onLoggedIn: _goHome),
-        _AppGate.home => MainShell(onLogout: _goLoginFromHome),
+    return ScreenUtilInit(
+      designSize: const Size(393, 852),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (BuildContext context, Widget? child) {
+        return MaterialApp(
+          title: 'CIRO Alerts',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme(),
+          home: switch (_gate) {
+            _AppGate.loading => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            _AppGate.onboarding => OnboardingScreen(onFinished: _goLogin),
+            _AppGate.login => LoginScreen(onLoggedIn: _goHome),
+            _AppGate.home => MainShell(onLogout: _goLoginFromHome),
+          },
+        );
       },
     );
   }

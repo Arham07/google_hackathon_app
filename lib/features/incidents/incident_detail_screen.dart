@@ -6,6 +6,7 @@ import 'package:google_hackathon_app/features/incidents/models/incident_source.d
 import 'package:google_hackathon_app/features/map/incident_map_screen.dart';
 import 'package:google_hackathon_app/models/api_event.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/external_url.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
@@ -73,12 +74,12 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Incident details')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppDimens.space16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(AppColors.radius),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: _incident.thumbnailUrl != null
@@ -91,14 +92,14 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                     : _placeholderImage(),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimens.space16),
             Row(
               children: [
                 PriorityChip(priority: _incident.priority),
-                const SizedBox(width: 8),
+                SizedBox(width: AppDimens.space8),
                 if (_incident.status != null && _incident.status!.isNotEmpty)
                   _StatusChip(status: _incident.status!),
-                const SizedBox(width: 8),
+                SizedBox(width: AppDimens.space8),
                 Expanded(
                   child: Text(
                     _incident.authenticity.label,
@@ -111,23 +112,23 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               ],
             ),
             if (_incident.eventTags.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimens.space12),
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: AppDimens.space8,
+                runSpacing: AppDimens.space8,
                 children: _incident.eventTags
                     .map((String tag) => _TagChip(label: _formatTag(tag)))
                     .toList(),
               ),
             ],
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimens.space12),
             Text(
               _incident.title,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimens.space8),
             Text(
               _incident.locationLabel,
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -141,7 +142,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   color: AppColors.mutedForeground,
                 ),
               ),
-            const SizedBox(height: 4),
+            SizedBox(height: AppDimens.space4),
             Text(
               DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
               style: theme.textTheme.labelSmall?.copyWith(
@@ -149,7 +150,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               ),
             ),
             if (_incident.hasMapCoordinates) ...[
-              const SizedBox(height: 6),
+              SizedBox(height: AppDimens.space6),
               Text(
                 'Coordinates: ${_incident.mapLatitude.toStringAsFixed(6)}, '
                 '${_incident.mapLongitude.toStringAsFixed(6)}',
@@ -161,10 +162,10 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: 20),
+            SizedBox(height: AppDimens.space20),
             if (_loadingExtra)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
+              Padding(
+                padding: EdgeInsets.only(bottom: AppDimens.space12),
                 child: LinearProgressIndicator(minHeight: 2),
               ),
             Text(
@@ -172,7 +173,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               style: theme.textTheme.bodyLarge,
             ),
             if (_incident.sourceTrail.isNotEmpty) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimens.space24),
               ..._incident.sourceTrail.map(_buildSourceTrailSection),
             ],
             _Section(
@@ -181,7 +182,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               items: _precautionsToShow,
               isPlaceholder: _incident.precautions.isEmpty,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimens.space24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -220,9 +221,13 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
   Widget _placeholderImage() {
     return Container(
-      color: AppColors.secondary,
-      child: const Center(
-        child: Icon(Icons.image_outlined, size: 48, color: AppColors.mutedForeground),
+      color: AppColors.surfaceElevated,
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: AppDimens.iconXl,
+          color: AppColors.mutedForeground,
+        ),
       ),
     );
   }
@@ -245,17 +250,20 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.space8,
+        vertical: AppDimens.space4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.mapAccent.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         border: Border.all(color: AppColors.mapAccent.withValues(alpha: 0.4)),
       ),
       child: Text(
         status,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.mapAccent,
-          fontSize: 10,
+          fontSize: AppDimens.font10,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -271,11 +279,14 @@ class _TagChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.space10,
+        vertical: AppDimens.space6,
+      ),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppDimens.radiusPill),
+        border: Border.all(color: AppColors.tacticalBorder),
       ),
       child: Text(
         label,
@@ -308,7 +319,7 @@ class _WeatherSection extends StatelessWidget {
     ];
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: AppDimens.space16),
       child: _InfoCard(
         title: 'Weather intel',
         icon: Icons.cloud_outlined,
@@ -317,7 +328,7 @@ class _WeatherSection extends StatelessWidget {
           children: lines
               .map(
                 (String line) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
+                  padding: EdgeInsets.only(bottom: AppDimens.space6),
                   child: Text(line, style: theme.textTheme.bodyMedium),
                 ),
               )
@@ -338,7 +349,7 @@ class _NewsSection extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: AppDimens.space16),
       child: _InfoCard(
         title: 'Related news',
         icon: Icons.newspaper_outlined,
@@ -348,25 +359,25 @@ class _NewsSection extends StatelessWidget {
             final bool canOpen = url != null && url.isNotEmpty;
 
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: AppDimens.space12),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: canOpen
                       ? () => openExternalUrl(context, url)
                       : null,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    padding: EdgeInsets.symmetric(vertical: AppDimens.space4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (article.thumbnailUrl != null)
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                             child: Image.network(
                               article.thumbnailUrl!,
-                              height: 120,
+                              height: AppDimens.newsThumbHeight,
                               width: double.infinity,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
@@ -374,7 +385,7 @@ class _NewsSection extends StatelessWidget {
                             ),
                           ),
                         if (article.thumbnailUrl != null)
-                          const SizedBox(height: 8),
+                          SizedBox(height: AppDimens.space8),
                         Text(
                           article.headline,
                           style: theme.textTheme.titleSmall?.copyWith(
@@ -386,7 +397,7 @@ class _NewsSection extends StatelessWidget {
                           ),
                         ),
                         if (article.publishedAt != null) ...[
-                          const SizedBox(height: 4),
+                          SizedBox(height: AppDimens.space4),
                           Text(
                             article.publishedAt!,
                             style: theme.textTheme.labelSmall?.copyWith(
@@ -395,10 +406,10 @@ class _NewsSection extends StatelessWidget {
                           ),
                         ],
                         if (canOpen) ...[
-                          const SizedBox(height: 8),
+                          SizedBox(height: AppDimens.space8),
                           TextButton.icon(
                             onPressed: () => openExternalUrl(context, url),
-                            icon: const Icon(Icons.open_in_new, size: 16),
+                            icon: Icon(Icons.open_in_new, size: AppDimens.iconSm),
                             label: const Text('Read article'),
                           ),
                         ],
@@ -430,19 +441,19 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimens.space16),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppColors.radius),
-        border: Border.all(color: AppColors.border),
+        color: AppColors.glassPanel,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(color: AppColors.tacticalBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: AppColors.mapAccent),
-              const SizedBox(width: 8),
+              Icon(icon, size: AppDimens.iconLg, color: AppColors.mapAccent),
+              SizedBox(width: AppDimens.space8),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -451,7 +462,7 @@ class _InfoCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimens.space12),
           child,
         ],
       ),
@@ -475,19 +486,19 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(AppDimens.space16),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppColors.radius),
-        border: Border.all(color: AppColors.border),
+        color: AppColors.glassPanel,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(color: AppColors.tacticalBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: AppColors.mapAccent),
-              const SizedBox(width: 8),
+              Icon(icon, size: AppDimens.iconLg, color: AppColors.mapAccent),
+              SizedBox(width: AppDimens.space8),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -496,10 +507,10 @@ class _Section extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimens.space12),
           ...items.map(
             (String item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(bottom: AppDimens.space8),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

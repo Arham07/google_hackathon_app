@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/location_service.dart';
@@ -255,17 +257,17 @@ class _MapTabScreenState extends State<MapTabScreen> {
             },
           ),
           Positioned(
-            top: MediaQuery.paddingOf(context).top + 8,
-            left: 12,
-            right: 12,
+            top: MediaQuery.paddingOf(context).top + AppDimens.space8,
+            left: AppDimens.space12,
+            right: AppDimens.space12,
             child: MapSearchBar(onPlaceSelected: _onPlaceSelected),
           ),
           if (incidents.mapEventsLoading)
-            const Positioned(
+            Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: LinearProgressIndicator(minHeight: 2),
+              child: LinearProgressIndicator(minHeight: 2.h),
             ),
         ],
       ),
@@ -279,7 +281,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
             onPressed: _goToMyLocation,
             child: const Icon(Icons.my_location),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimens.space12),
           FloatingActionButton.extended(
             heroTag: 'map_all_alerts',
             onPressed: canShowAllAlerts ? _fitAllAlerts : null,

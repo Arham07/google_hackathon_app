@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/user_reports_api.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SubmitIncidentScreen extends StatefulWidget {
@@ -107,23 +109,23 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Report incident')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppDimens.space16),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(AppDimens.space14),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(AppColors.radius),
-                  border: Border.all(color: AppColors.border),
+                  color: AppColors.glassPanel,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                  border: Border.all(color: AppColors.tacticalBorder),
                 ),
                 child: Row(
                   children: [
                     const Icon(Icons.pin_drop, color: AppColors.mapAccent),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppDimens.space12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +148,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: AppDimens.space20),
               TextFormField(
                 controller: _textController,
                 maxLines: 5,
@@ -163,7 +165,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppDimens.space16),
               TextFormField(
                 controller: _cityController,
                 decoration: const InputDecoration(
@@ -171,7 +173,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   prefixIcon: Icon(Icons.location_city_outlined),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppDimens.space16),
               TextFormField(
                 controller: _areaController,
                 decoration: const InputDecoration(
@@ -179,32 +181,32 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   prefixIcon: Icon(Icons.map_outlined),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: AppDimens.space20),
               OutlinedButton.icon(
                 onPressed: _pickPhoto,
                 icon: const Icon(Icons.photo_camera_outlined),
                 label: Text(_photo == null ? 'Add photo (optional)' : 'Change photo'),
               ),
               if (_photo != null) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimens.space12),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(AppColors.radius),
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                   child: Image.file(
                     File(_photo!.path),
-                    height: 160,
+                    height: AppDimens.photoPreviewHeight,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
                 ),
               ],
-              const SizedBox(height: 28),
+              SizedBox(height: AppDimens.space28),
               ElevatedButton(
                 onPressed: _submitting ? null : _submit,
                 child: _submitting
-                    ? const SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    ? SizedBox(
+                        height: 22.w,
+                        width: 22.w,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text('Submit report'),
               ),

@@ -4,6 +4,7 @@ import 'package:google_hackathon_app/features/incidents/incident_detail_screen.d
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 import 'package:google_hackathon_app/widgets/incident_card.dart';
 import 'package:provider/provider.dart';
@@ -55,7 +56,12 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            padding: EdgeInsets.fromLTRB(
+              AppDimens.space16,
+              AppDimens.space8,
+              AppDimens.space16,
+              0,
+            ),
             child: SegmentedButton<IncidentListMode>(
               segments: const [
                 ButtonSegment(
@@ -81,26 +87,26 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               },
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppDimens.space8),
           SizedBox(
-            height: 40,
+            height: AppDimens.chipRowHeight,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: AppDimens.space12),
               children: IncidentPriority.values
                   .where((IncidentPriority p) => p != IncidentPriority.unknown)
                   .map((IncidentPriority priority) {
                 final bool selected =
                     controller.activePriorityFilters.contains(priority);
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: EdgeInsets.symmetric(horizontal: AppDimens.space4),
                   child: FilterChip(
                     label: Text(
                       priority.label,
                       style: TextStyle(
                         color: selected ? priority.color : null,
                         fontWeight: FontWeight.w600,
-                        fontSize: 11,
+                        fontSize: AppDimens.font11,
                       ),
                     ),
                     selected: selected,
@@ -115,7 +121,12 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
           if (controller.mode == IncidentListMode.nearby &&
               controller.nearestArea?.area != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: EdgeInsets.fromLTRB(
+                AppDimens.space16,
+                AppDimens.space8,
+                AppDimens.space16,
+                0,
+              ),
               child: Text(
                 _nearestBanner(controller),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -146,18 +157,22 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
     if (controller.errorMessage != null && controller.visibleIncidents.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(AppDimens.space24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.cloud_off, size: 48, color: AppColors.mutedForeground),
-              const SizedBox(height: 16),
+              Icon(
+                Icons.cloud_off,
+                size: AppDimens.iconXl,
+                color: AppColors.mutedForeground,
+              ),
+              SizedBox(height: AppDimens.space16),
               Text(
                 controller.errorMessage!,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppDimens.space16),
               FilledButton.icon(
                 onPressed: controller.load,
                 icon: const Icon(Icons.refresh),
@@ -188,7 +203,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
       onRefresh: controller.load,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 8, bottom: 24),
+        padding: EdgeInsets.only(top: AppDimens.space8, bottom: AppDimens.space24),
         itemCount: incidents.length,
         itemBuilder: (BuildContext context, int index) {
           final Incident incident = incidents[index];

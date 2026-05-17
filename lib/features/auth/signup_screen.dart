@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.onSignedUp});
@@ -41,7 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
       appBar: AppBar(title: const Text('Create account')),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(AppDimens.space24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -53,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         color: AppColors.mutedForeground,
                       ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppDimens.space24),
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
@@ -68,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space16),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -85,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space16),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscure,
@@ -104,7 +105,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimens.space16),
                 TextFormField(
                   controller: _confirmController,
                   obscureText: _obscure,
@@ -119,7 +120,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: AppDimens.space32),
                 ElevatedButton(
                   onPressed: _submit,
                   child: const Text('Sign up'),

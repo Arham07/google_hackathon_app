@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
 
@@ -19,30 +20,33 @@ class IncidentCard extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final Color borderColor = incident.isUserSubmitted
         ? AppColors.userSubmitted.withValues(alpha: 0.5)
-        : AppColors.border;
+        : AppColors.tacticalBorder;
     final Color bgColor = incident.isUserSubmitted
         ? AppColors.userSubmittedBg
-        : AppColors.secondary.withValues(alpha: 0.5);
+        : AppColors.glassPanel;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.space16,
+        vertical: AppDimens.space6,
+      ),
       child: Material(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppColors.radius),
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AppColors.radius),
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppColors.radius),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(color: borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(AppColors.radius),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(AppDimens.radiusMd),
                   ),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
@@ -57,39 +61,39 @@ class IncidentCard extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: EdgeInsets.all(AppDimens.space14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           PriorityChip(priority: incident.priority),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimens.space8),
                           if (incident.isUserSubmitted)
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppDimens.space8,
+                                vertical: AppDimens.space4,
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.userSubmitted.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                                 border: Border.all(
                                   color: AppColors.userSubmitted.withValues(alpha: 0.5),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Citizen report',
                                 style: TextStyle(
                                   color: AppColors.userSubmitted,
-                                  fontSize: 10,
+                                  fontSize: AppDimens.font10,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: AppDimens.space10),
                       Text(
                         incident.title,
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -98,15 +102,15 @@ class IncidentCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: AppDimens.space6),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.place_outlined,
-                            size: 14,
+                            size: AppDimens.iconXs,
                             color: AppColors.mutedForeground,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: AppDimens.space4),
                           Expanded(
                             child: Text(
                               incident.locationLabel,
@@ -117,7 +121,7 @@ class IncidentCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: AppDimens.space8),
                       Text(
                         incident.authenticity.label,
                         style: theme.textTheme.labelSmall?.copyWith(
@@ -125,25 +129,25 @@ class IncidentCard extends StatelessWidget {
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: AppDimens.space8),
                       Text(
                         DateFormat('dd MMM yyyy, HH:mm').format(incident.scanDatetime),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: AppColors.mutedForeground,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppDimens.space12),
                       Row(
                         children: [
                           OutlinedButton.icon(
                             onPressed: onTap,
-                            icon: const Icon(Icons.info_outline, size: 18),
+                            icon: Icon(Icons.info_outline, size: AppDimens.iconMd),
                             label: const Text('Details'),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimens.space8),
                           FilledButton.tonalIcon(
                             onPressed: onTap,
-                            icon: const Icon(Icons.map_outlined, size: 18),
+                            icon: Icon(Icons.map_outlined, size: AppDimens.iconMd),
                             label: const Text('Map'),
                           ),
                         ],
@@ -161,11 +165,11 @@ class IncidentCard extends StatelessWidget {
 
   Widget _placeholderImage() {
     return Container(
-      color: AppColors.secondary,
-      child: const Center(
+      color: AppColors.surfaceElevated,
+      child: Center(
         child: Icon(
           Icons.flood_outlined,
-          size: 48,
+          size: AppDimens.iconXl,
           color: AppColors.mutedForeground,
         ),
       ),
