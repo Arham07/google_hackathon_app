@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Tactical dark theme aligned with [ciro-main/src/app/globals.css].
-/// Zinc-950 surfaces, blue map accent, glass panels.
+/// Zinc-950 surfaces, brand accent (#000035), glass panels.
 abstract final class AppColors {
   // Core surfaces — oklch(0.145 0 0) ≈ zinc-950 (#09090b)
   static final Color background = const Color(0xFF212121);
@@ -51,8 +51,8 @@ abstract final class AppColors {
   static const Color userSubmitted = Color(0xFFA78BFA);
   static const Color userSubmittedBg = Color(0x402C1D4D);
 
-  /// Map / tactical accent — blue-500, InfoWindow glow
-  static const Color mapAccent = Color(0xFF3B82F6);
+  /// Map / links / focus — brand navy (replaces prior blue accent).
+  static const Color mapAccent = Color(0xFF000035);
 
   /// Use [AppDimens.radiusMd] in widgets; kept for const chart borders etc.
   static const double radius = 10;
