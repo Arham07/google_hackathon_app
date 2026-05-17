@@ -21,13 +21,9 @@ class MapTabScreen extends StatefulWidget {
 }
 
 class _MapTabScreenState extends State<MapTabScreen> {
-  final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
 
-  static const CameraPosition _kKarachi = CameraPosition(
-    target: LatLng(24.8607, 67.0011),
-    zoom: 11.5,
-  );
+  static const CameraPosition _kKarachi = CameraPosition(target: LatLng(24.8607, 67.0011), zoom: 11.5);
 
   CameraPosition? _initialCamera;
   BitmapDescriptor? _alertIcon;
@@ -46,8 +42,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
   }
 
   Future<void> _bootstrapMap() async {
-    final IncidentsController incidents =
-        context.read<IncidentsController>();
+    final IncidentsController incidents = context.read<IncidentsController>();
 
     final List<dynamic> results = await Future.wait<dynamic>(<Future<dynamic>>[
       LocationService.getCurrentLatLng(),
@@ -67,46 +62,31 @@ class _MapTabScreenState extends State<MapTabScreen> {
     } else {
       _locationReady = false;
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Location unavailable — showing Karachi. Enable GPS for your position.',
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Location unavailable — showing Karachi. Enable GPS for your position.')));
       }
     }
 
     if (incidents.mapEventsError != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(incidents.mapEventsError!)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(incidents.mapEventsError!)));
     }
 
     setState(() {
       _initialCamera = CameraPosition(target: cameraTarget, zoom: 14);
       _alertIcon = icon;
-      _incidentMarkers = _buildMarkersFromIncidents(
-        incidents.mapEventsWithCoordinates,
-        icon,
-      );
+      _incidentMarkers = _buildMarkersFromIncidents(incidents.mapEventsWithCoordinates, icon);
       _mapReady = true;
     });
   }
 
-  Set<Marker> _buildMarkersFromIncidents(
-    List<Incident> incidents,
-    BitmapDescriptor icon,
-  ) {
+  Set<Marker> _buildMarkersFromIncidents(List<Incident> incidents, BitmapDescriptor icon) {
     return incidents.map((Incident incident) {
       return Marker(
         markerId: MarkerId(incident.id),
         position: LatLng(incident.latitude, incident.longitude),
         icon: icon,
-        infoWindow: InfoWindow(
-          title: incident.title,
-          snippet: incident.address ?? incident.area,
-        ),
+        infoWindow: InfoWindow(title: incident.title, snippet: incident.address ?? incident.area),
       );
     }).toSet();
   }
@@ -114,10 +94,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
   void _syncMarkersFromController(IncidentsController incidents) {
     if (_alertIcon == null) return;
     setState(() {
-      _incidentMarkers = _buildMarkersFromIncidents(
-        incidents.mapEventsWithCoordinates,
-        _alertIcon!,
-      );
+      _incidentMarkers = _buildMarkersFromIncidents(incidents.mapEventsWithCoordinates, _alertIcon!);
     });
   }
 
@@ -127,40 +104,26 @@ class _MapTabScreenState extends State<MapTabScreen> {
       _searchMarker = Marker(
         markerId: const MarkerId('search_result'),
         position: target,
-        infoWindow: InfoWindow(
-          title: place.name.isNotEmpty ? place.name : 'Selected place',
-          snippet: place.address,
-        ),
+        infoWindow: InfoWindow(title: place.name.isNotEmpty ? place.name : 'Selected place', snippet: place.address),
       );
     });
 
     if (_mapController.isCompleted) {
       final GoogleMapController controller = await _mapController.future;
-      await controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: target, zoom: 15),
-        ),
-      );
+      await controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: target, zoom: 15)));
     }
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${place.latitude.toStringAsFixed(6)}, ${place.longitude.toStringAsFixed(6)}',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('${place.latitude.toStringAsFixed(6)}, ${place.longitude.toStringAsFixed(6)}')));
   }
 
   Future<void> _goToMyLocation() async {
-    final LatLng? position =
-        _currentPosition ?? await LocationService.getCurrentLatLng();
+    final LatLng? position = _currentPosition ?? await LocationService.getCurrentLatLng();
     if (position == null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not get your location.')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not get your location.')));
       return;
     }
     setState(() {
@@ -169,16 +132,11 @@ class _MapTabScreenState extends State<MapTabScreen> {
     });
     if (!_mapController.isCompleted) return;
     final GoogleMapController controller = await _mapController.future;
-    await controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: position, zoom: 16),
-      ),
-    );
+    await controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: position, zoom: 16)));
   }
 
   Future<void> _fitAllAlerts() async {
-    final IncidentsController incidents =
-        context.read<IncidentsController>();
+    final IncidentsController incidents = context.read<IncidentsController>();
 
     if (incidents.mapEventsLoading) return;
 
@@ -186,9 +144,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
       await incidents.loadMapEvents();
       if (!mounted) return;
       if (incidents.mapEventsError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(incidents.mapEventsError!)),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(incidents.mapEventsError!)));
         return;
       }
       _syncMarkersFromController(incidents);
@@ -197,9 +153,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
     final List<Incident> plot = incidents.mapEventsWithCoordinates;
     if (plot.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No alerts to display on the map.')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No alerts to display on the map.')));
       return;
     }
 
@@ -219,37 +173,77 @@ class _MapTabScreenState extends State<MapTabScreen> {
     }
 
     await controller.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(minLat, minLng),
-          northeast: LatLng(maxLat, maxLng),
-        ),
-        80,
-      ),
+      CameraUpdate.newLatLngBounds(LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng)), 80),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final IncidentsController incidents = context.watch<IncidentsController>();
-    final bool canShowAllAlerts =
-        _mapReady && _alertIcon != null && !incidents.mapEventsLoading;
+    final bool canShowAllAlerts = _mapReady && _alertIcon != null && !incidents.mapEventsLoading;
 
     if (!_mapReady || _initialCamera == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
-            mapType: MapType.hybrid,
+            mapType: MapType.normal,
             initialCameraPosition: _initialCamera!,
             markers: _allMarkers,
             myLocationEnabled: _locationReady,
             myLocationButtonEnabled: false,
+            style: '''
+  [
+    {
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#212121" }
+      ]
+    },
+    {
+      "elementType": "labels.icon",
+      "stylers": [
+        { "visibility": "off" }
+      ]
+    },
+    {
+      "elementType": "labels.text.fill",
+      "stylers": [
+        { "color": "#757575" }
+      ]
+    },
+    {
+      "elementType": "labels.text.stroke",
+      "stylers": [
+        { "color": "#212121" }
+      ]
+    },
+    {
+      "featureType": "road",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#383838" }
+      ]
+    },
+    {
+      "featureType": "road",
+      "elementType": "geometry.stroke",
+      "stylers": [
+        { "color": "#1f1f1f" }
+      ]
+    },
+    {
+      "featureType": "water",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#000000" }
+      ]
+    }
+  ]
+  ''',
             onMapCreated: (GoogleMapController controller) {
               if (!_mapController.isCompleted) {
                 _mapController.complete(controller);

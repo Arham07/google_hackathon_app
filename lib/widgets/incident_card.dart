@@ -6,11 +6,7 @@ import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
 
 class IncidentCard extends StatelessWidget {
-  const IncidentCard({
-    super.key,
-    required this.incident,
-    required this.onTap,
-  });
+  const IncidentCard({super.key, required this.incident, required this.onTap});
 
   final Incident incident;
   final VoidCallback onTap;
@@ -51,12 +47,7 @@ class IncidentCard extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: incident.thumbnailUrl != null
-                        ? Image.network(
-                            incident.thumbnailUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                _placeholderImage(),
-                          )
+                        ? Image.network(incident.thumbnailUrl!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => _placeholderImage())
                         : _placeholderImage(),
                   ),
                 ),
@@ -96,9 +87,7 @@ class IncidentCard extends StatelessWidget {
                       SizedBox(height: AppDimens.space10),
                       Text(
                         incident.title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -112,22 +101,14 @@ class IncidentCard extends StatelessWidget {
                           ),
                           SizedBox(width: AppDimens.space4),
                           Expanded(
-                            child: Text(
-                              incident.locationLabel,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.mutedForeground,
-                              ),
-                            ),
+                            child: Text(incident.locationLabel, style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground)),
                           ),
                         ],
                       ),
                       SizedBox(height: AppDimens.space8),
                       Text(
                         incident.authenticity.label,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppColors.chart2,
-                          fontStyle: FontStyle.italic,
-                        ),
+                        style: theme.textTheme.labelSmall?.copyWith(color: AppColors.chart2, fontStyle: FontStyle.italic),
                       ),
                       SizedBox(height: AppDimens.space8),
                       Text(

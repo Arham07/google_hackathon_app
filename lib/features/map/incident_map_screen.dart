@@ -46,13 +46,55 @@ class _IncidentMapScreenState extends State<IncidentMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Incident location')),
-      body: GoogleMap(
-        mapType: MapType.hybrid,
+      body:GoogleMap(
+        mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
           target: LatLng(widget.latitude, widget.longitude),
           zoom: 15,
         ),
         markers: _markers,
+        style: '''
+  [
+    {
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#212121" }
+      ]
+    },
+    {
+      "elementType": "labels.icon",
+      "stylers": [
+        { "visibility": "off" }
+      ]
+    },
+    {
+      "elementType": "labels.text.fill",
+      "stylers": [
+        { "color": "#757575" }
+      ]
+    },
+    {
+      "elementType": "labels.text.stroke",
+      "stylers": [
+        { "color": "#212121" }
+      ]
+    },
+    {
+      "featureType": "road",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#383838" }
+      ]
+    },
+    {
+      "featureType": "water",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#000000" }
+      ]
+    }
+  ]
+  ''',
       ),
     );
   }

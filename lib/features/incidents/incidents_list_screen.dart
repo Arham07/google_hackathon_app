@@ -141,8 +141,8 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
   }
 
   String _nearestBanner(IncidentsController controller) {
-    final area = controller.nearestArea?.area ?? 'your area';
-    final km = controller.nearestArea?.distanceKm;
+    final String area = controller.nearestArea?.area ?? 'your area';
+    final double? km = controller.nearestArea?.distanceKm;
     if (km != null) {
       return 'Showing incidents near $area (${km.toStringAsFixed(1)} km away)';
     }
