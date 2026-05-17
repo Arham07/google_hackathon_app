@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Zinc-950 surfaces, brand accent (#000035), glass panels.
 abstract final class AppColors {
   // Core surfaces — oklch(0.145 0 0) ≈ zinc-950 (#09090b)
-  static final Color background = const Color(0xFF212121);
+  static final Color background = Color(0xFF000035).withValues(alpha: 0.25);
   static const Color foreground = Color(0xFFFAFAFA);
   static const Color card = Color(0xFF09090B);
   static const Color cardForeground = Color(0xFFFAFAFA);
@@ -52,7 +52,7 @@ abstract final class AppColors {
   static const Color userSubmittedBg = Color(0x402C1D4D);
 
   /// Map / links / focus — brand navy (replaces prior blue accent).
-  static const Color mapAccent = Color(0xFF000035);
+  static const Color mapAccent = Color(0xFFFAFAFA);
 
   /// Use [AppDimens.radiusMd] in widgets; kept for const chart borders etc.
   static const double radius = 10;
