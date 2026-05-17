@@ -119,22 +119,6 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               }).toList(),
             ),
           ),
-          if (controller.mode == IncidentListMode.nearby &&
-              controller.nearestArea?.area != null)
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppDimens.space16,
-                AppDimens.space8,
-                AppDimens.space16,
-                0,
-              ),
-              child: Text(
-                _nearestBanner(controller),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.mapAccent,
-                    ),
-              ),
-            ),
           Expanded(child: _buildBody(context, controller)),
         ],
       ),
