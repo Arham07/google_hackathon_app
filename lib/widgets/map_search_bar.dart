@@ -57,7 +57,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
     if (!MapsConfig.hasApiKey) {
       setState(() {
         _suggestions = [];
-        _error = 'Add MAPS_API_KEY via --dart-define when running the app';
+        _error = 'Google Maps API key is not configured';
       });
       return;
     }
