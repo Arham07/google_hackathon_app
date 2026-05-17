@@ -112,31 +112,31 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               }).toList(),
             ),
           ),
-          if (controller.mode == IncidentListMode.nearby &&
-              controller.nearestArea?.area != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Text(
-                _nearestBanner(controller),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.mapAccent,
-                    ),
-              ),
-            ),
+          // if (controller.mode == IncidentListMode.nearby &&
+          //     controller.nearestArea?.area != null)
+          //   Padding(
+          //     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          //     child: Text(
+          //       _nearestBanner(controller),
+          //       style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          //             color: AppColors.mapAccent,
+          //           ),
+          //     ),
+          //   ),
           Expanded(child: _buildBody(context, controller)),
         ],
       ),
     );
   }
 
-  String _nearestBanner(IncidentsController controller) {
-    final area = controller.nearestArea?.area ?? 'your area';
-    final km = controller.nearestArea?.distanceKm;
-    if (km != null) {
-      return 'Showing incidents near $area (${km.toStringAsFixed(1)} km away)';
-    }
-    return 'Showing incidents near $area';
-  }
+  // String _nearestBanner(IncidentsController controller) {
+  //   final area = controller.nearestArea?.area ?? 'your area';
+  //   final km = controller.nearestArea?.distanceKm;
+  //   if (km != null) {
+  //     return 'Showing incidents near $area (${km.toStringAsFixed(1)} km away)';
+  //   }
+  //   return 'Showing incidents near $area';
+  // }
 
   Widget _buildBody(BuildContext context, IncidentsController controller) {
     if (controller.isLoading && controller.visibleIncidents.isEmpty) {

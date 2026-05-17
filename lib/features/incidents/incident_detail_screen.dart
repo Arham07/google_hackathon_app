@@ -44,8 +44,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
   Future<void> _loadFull() async {
     setState(() => _loadingExtra = true);
     try {
-      final Map<String, dynamic>? full =
-          await _eventsApi.fetchById(widget.incident.id);
+      final Map<String, dynamic>? full = await _eventsApi.fetchById(widget.incident.id);
       if (!mounted) return;
       if (full != null) {
         _incident = mergeFullEvent(widget.incident, full);
@@ -59,12 +58,9 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     }
   }
 
-  List<String> get _precautionsToShow => _incident.precautions.isNotEmpty
-      ? _incident.precautions
-      : _placeholderPrecautions;
+  List<String> get _precautionsToShow => _incident.precautions.isNotEmpty ? _incident.precautions : _placeholderPrecautions;
 
-  List<String> get _resourcesToShow =>
-      _incident.resources.isNotEmpty ? _incident.resources : _placeholderResources;
+  List<String> get _resourcesToShow => _incident.resources.isNotEmpty ? _incident.resources : _placeholderResources;
 
   @override
   Widget build(BuildContext context) {
@@ -72,137 +68,93 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Incident details')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppColors.radius),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: _incident.thumbnailUrl != null
-                    ? Image.network(
-                        _incident.thumbnailUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            _placeholderImage(),
-                      )
-                    : _placeholderImage(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppColors.radius),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: _incident.thumbnailUrl != null
+                      ? Image.network(_incident.thumbnailUrl!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => _placeholderImage())
+                      : _placeholderImage(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                PriorityChip(priority: _incident.priority),
-                const SizedBox(width: 8),
-                if (_incident.status != null && _incident.status!.isNotEmpty)
-                  _StatusChip(status: _incident.status!),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _incident.authenticity.label,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.chart2,
-                      fontStyle: FontStyle.italic,
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  PriorityChip(priority: _incident.priority),
+                  const SizedBox(width: 8),
+                  if (_incident.status != null && _incident.status!.isNotEmpty) _StatusChip(status: _incident.status!),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _incident.authenticity.label,
+                      style: theme.textTheme.labelSmall?.copyWith(color: AppColors.chart2, fontStyle: FontStyle.italic),
                     ),
+                  ),
+                ],
+              ),
+              if (_incident.eventTags.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Wrap(spacing: 8, runSpacing: 8, children: _incident.eventTags.map((String tag) => _TagChip(label: _formatTag(tag))).toList()),
+              ],
+              const SizedBox(height: 12),
+              Text(_incident.title, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(_incident.locationLabel, style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground)),
+              if (_incident.area.isNotEmpty)
+                Text('${_incident.area}, ${_incident.city}', style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground)),
+              const SizedBox(height: 4),
+              Text(
+                DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
+                style: theme.textTheme.labelSmall?.copyWith(color: AppColors.mutedForeground),
+              ),
+              if (_incident.hasMapCoordinates) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Coordinates: ${_incident.mapLatitude.toStringAsFixed(6)}, '
+                  '${_incident.mapLongitude.toStringAsFixed(6)}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.mapAccent,
+                    fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
                   ),
                 ),
               ],
-            ),
-            if (_incident.eventTags.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _incident.eventTags
-                    .map((String tag) => _TagChip(label: _formatTag(tag)))
-                    .toList(),
+              const SizedBox(height: 20),
+              if (_loadingExtra) const Padding(padding: EdgeInsets.only(bottom: 12), child: LinearProgressIndicator(minHeight: 2)),
+              Text(_incident.summary, style: theme.textTheme.bodyLarge),
+              if (_incident.sourceTrail.isNotEmpty) ...[const SizedBox(height: 24), ..._incident.sourceTrail.map(_buildSourceTrailSection)],
+              _Section(
+                title: 'Precautions',
+                icon: Icons.warning_amber_rounded,
+                items: _precautionsToShow,
+                isPlaceholder: _incident.precautions.isEmpty,
               ),
-            ],
-            const SizedBox(height: 12),
-            Text(
-              _incident.title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _incident.locationLabel,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.mutedForeground,
-              ),
-            ),
-            if (_incident.area.isNotEmpty)
-              Text(
-                '${_incident.area}, ${_incident.city}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.mutedForeground,
-                ),
-              ),
-            const SizedBox(height: 4),
-            Text(
-              DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.mutedForeground,
-              ),
-            ),
-            if (_incident.hasMapCoordinates) ...[
-              const SizedBox(height: 6),
-              Text(
-                'Coordinates: ${_incident.mapLatitude.toStringAsFixed(6)}, '
-                '${_incident.mapLongitude.toStringAsFixed(6)}',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppColors.mapAccent,
-                  fontFeatures: const <FontFeature>[
-                    FontFeature.tabularFigures(),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 20),
-            if (_loadingExtra)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: LinearProgressIndicator(minHeight: 2),
-              ),
-            Text(
-              _incident.summary,
-              style: theme.textTheme.bodyLarge,
-            ),
-            if (_incident.sourceTrail.isNotEmpty) ...[
-              const SizedBox(height: 24),
-              ..._incident.sourceTrail.map(_buildSourceTrailSection),
-            ],
-            _Section(
-              title: 'Precautions',
-              icon: Icons.warning_amber_rounded,
-              items: _precautionsToShow,
-              isPlaceholder: _incident.precautions.isEmpty,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _incident.hasMapCoordinates
-                    ? () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => IncidentMapScreen(
-                              latitude: _incident.mapLatitude,
-                              longitude: _incident.mapLongitude,
-                              title: _incident.title,
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                icon: const Icon(Icons.map_outlined),
-                label: const Text('Open on map'),
-              ),
-            ),
-          ],
+              const SizedBox(height: 50),
+            ]
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        backgroundColor: Colors.blue,
+        onPressed: _incident.hasMapCoordinates
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => IncidentMapScreen(latitude: _incident.mapLatitude, longitude: _incident.mapLongitude, title: _incident.title),
+                  ),
+                );
+              }
+            : null,
+        icon: const Icon(Icons.map, color: Colors.white),
+        label: const Text(
+          'Open on Map',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -221,18 +173,13 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
   Widget _placeholderImage() {
     return Container(
       color: AppColors.secondary,
-      child: const Center(
-        child: Icon(Icons.image_outlined, size: 48, color: AppColors.mutedForeground),
-      ),
+      child: const Center(child: Icon(Icons.image_outlined, size: 48, color: AppColors.mutedForeground)),
     );
   }
 
   String _formatTag(String tag) {
     if (tag.isEmpty) return tag;
-    final String spaced = tag.replaceAllMapped(
-      RegExp(r'([a-z])([A-Z])'),
-      (Match m) => '${m[1]} ${m[2]}',
-    );
+    final String spaced = tag.replaceAllMapped(RegExp(r'([a-z])([A-Z])'), (Match m) => '${m[1]} ${m[2]}');
     return spaced[0].toUpperCase() + spaced.substring(1);
   }
 }
@@ -253,11 +200,7 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         status,
-        style: const TextStyle(
-          color: AppColors.mapAccent,
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(color: AppColors.mapAccent, fontSize: 10, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -277,12 +220,7 @@ class _TagChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-      ),
+      child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w500)),
     );
   }
 }
@@ -301,10 +239,8 @@ class _WeatherSection extends StatelessWidget {
       if (weather.humidity != null) 'Humidity: ${weather.humidity}%',
       if (weather.windKph != null) 'Wind: ${weather.windKph!.toStringAsFixed(1)} km/h',
       if (weather.day1Condition != null) 'Tomorrow: ${weather.day1Condition}',
-      if (weather.day1PrecipMm != null)
-        'Expected rain: ${weather.day1PrecipMm!.toStringAsFixed(1)} mm',
-      if (weather.day1RainChance != null)
-        'Rain chance: ${weather.day1RainChance}%',
+      if (weather.day1PrecipMm != null) 'Expected rain: ${weather.day1PrecipMm!.toStringAsFixed(1)} mm',
+      if (weather.day1RainChance != null) 'Rain chance: ${weather.day1RainChance}%',
     ];
 
     return Padding(
@@ -352,9 +288,7 @@ class _NewsSection extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: canOpen
-                      ? () => openExternalUrl(context, url)
-                      : null,
+                  onTap: canOpen ? () => openExternalUrl(context, url) : null,
                   borderRadius: BorderRadius.circular(8),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
@@ -369,30 +303,22 @@ class _NewsSection extends StatelessWidget {
                               height: 120,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox.shrink(),
+                              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                             ),
                           ),
-                        if (article.thumbnailUrl != null)
-                          const SizedBox(height: 8),
+                        if (article.thumbnailUrl != null) const SizedBox(height: 8),
                         Text(
                           article.headline,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: canOpen ? AppColors.mapAccent : null,
-                            decoration:
-                                canOpen ? TextDecoration.underline : null,
+                            decoration: canOpen ? TextDecoration.underline : null,
                             decorationColor: AppColors.mapAccent,
                           ),
                         ),
                         if (article.publishedAt != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            article.publishedAt!,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.mutedForeground,
-                            ),
-                          ),
+                          Text(article.publishedAt!, style: theme.textTheme.labelSmall?.copyWith(color: AppColors.mutedForeground)),
                         ],
                         if (canOpen) ...[
                           const SizedBox(height: 8),
@@ -413,15 +339,10 @@ class _NewsSection extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.title,
-    required this.icon,
-    required this.child,
-  });
+  const _InfoCard({required this.title, required this.icon, required this.child});
 
   final String title;
   final IconData icon;
@@ -443,12 +364,7 @@ class _InfoCard extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: AppColors.mapAccent),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
@@ -460,12 +376,7 @@ class _InfoCard extends StatelessWidget {
 }
 
 class _Section extends StatelessWidget {
-  const _Section({
-    required this.title,
-    required this.icon,
-    required this.items,
-    this.isPlaceholder = false,
-  });
+  const _Section({required this.title, required this.icon, required this.items, this.isPlaceholder = false});
 
   final String title;
   final IconData icon;
@@ -488,12 +399,7 @@ class _Section extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: AppColors.mapAccent),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
@@ -503,16 +409,12 @@ class _Section extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!isPlaceholder)
-                    const Text('• ', style: TextStyle(color: AppColors.mutedForeground)),
+                  if (!isPlaceholder) const Text('• ', style: TextStyle(color: AppColors.mutedForeground)),
                   Expanded(
                     child: Text(
                       item,
                       style: isPlaceholder
-                          ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.mutedForeground,
-                                fontStyle: FontStyle.italic,
-                              )
+                          ? Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground, fontStyle: FontStyle.italic)
                           : null,
                     ),
                   ),
