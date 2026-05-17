@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_hackathon_app/utils/alert_marker_icon.dart';
+import 'package:google_hackathon_app/widgets/map_search_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -71,9 +73,15 @@ class MapSampleState extends State<MapSample> {
   );
 
   BitmapDescriptor? _alertIcon;
-  Set<Marker> _markers = {};
+  Set<Marker> _floodMarkers = {};
+  Marker? _searchMarker;
   LatLng? _currentPosition;
   bool _locationReady = false;
+
+  Set<Marker> get _allMarkers => {
+        ..._floodMarkers,
+        ?_searchMarker,
+      };
 
   @override
   void initState() {
@@ -99,8 +107,48 @@ class MapSampleState extends State<MapSample> {
     if (!mounted) return;
     setState(() {
       _alertIcon = icon;
-      _markers = markers;
+      _floodMarkers = markers;
     });
+  }
+
+  Future<void> _onPlaceSelected(SelectedPlace place) async {
+    debugPrint('--- Selected place ---');
+    debugPrint('Name: ${place.name}');
+    debugPrint('Address: ${place.address}');
+    debugPrint('Latitude: ${place.latitude}');
+    debugPrint('Longitude: ${place.longitude}');
+    debugPrint('Place ID: ${place.placeId}');
+
+    final LatLng target = LatLng(place.latitude, place.longitude);
+
+    setState(() {
+      _searchMarker = Marker(
+        markerId: const MarkerId('search_result'),
+        position: target,
+        infoWindow: InfoWindow(
+          title: place.name.isNotEmpty ? place.name : 'Selected place',
+          snippet: place.address,
+        ),
+      );
+    });
+
+    if (!_controller.isCompleted) return;
+    final GoogleMapController mapController = await _controller.future;
+    await mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: target, zoom: 15),
+      ),
+    );
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${place.latitude.toStringAsFixed(6)}, ${place.longitude.toStringAsFixed(6)}',
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   Future<void> _initUserLocation() async {
@@ -166,17 +214,27 @@ class MapSampleState extends State<MapSample> {
         title: const Text('Karachi flood alerts'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kKarachi,
-        markers: _markers,
-        myLocationEnabled: _locationReady,
-        myLocationButtonEnabled: false,
-        onMapCreated: (GoogleMapController controller) {
-          if (!_controller.isCompleted) {
-            _controller.complete(controller);
-          }
-        },
+      body: Stack(
+        children: [
+          GoogleMap(
+            mapType: MapType.hybrid,
+            initialCameraPosition: _kKarachi,
+            markers: _allMarkers,
+            myLocationEnabled: _locationReady,
+            myLocationButtonEnabled: false,
+            onMapCreated: (GoogleMapController controller) {
+              if (!_controller.isCompleted) {
+                _controller.complete(controller);
+              }
+            },
+          ),
+          Positioned(
+            top: 8,
+            left: 12,
+            right: 12,
+            child: MapSearchBar(onPlaceSelected: _onPlaceSelected),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

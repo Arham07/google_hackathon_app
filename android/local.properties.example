@@ -2,5 +2,8 @@
 sdk.dir=C\:\\path\\to\\Android\\sdk
 flutter.sdk=C\:\\path\\to\\flutter
 
-# Google Cloud Console → APIs & Services → Credentials → Maps SDK for Android key
+# Google Cloud Console → enable Maps SDK for Android + Places API on this key
 MAPS_API_KEY=your_android_maps_api_key_here
+
+# Same key for in-app place search (Dart):
+# flutter run --dart-define=MAPS_API_KEY=your_android_maps_api_key_here
