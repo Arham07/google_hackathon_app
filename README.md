@@ -2,10 +2,6 @@
 
 CIRO Alerts — Flutter client for incident feed, map, and citizen reports.
 
-## Liquid glass UI
-
-Glass panels use [`liquid_glass_renderer`](https://pub.dev/packages/liquid_glass_renderer). **Impeller is required** for the full liquid-glass shader on Android/iOS; list and dense UI use `FakeGlass` for performance. Test scroll and map interactions on target devices before release.
-
 ## Getting Started
 
 This project is a starting point for a Flutter application.

@@ -16,7 +16,7 @@ abstract final class AppColors {
   static const Color glassFill = Color(0x66040814);
   static const Color glassFillStrong = Color(0x99040814);
 
-  /// Legacy alias for panels that predate liquid_glass_renderer wrappers.
+  /// Semi-opaque panel fill for cards and overlays.
   static const Color glassPanel = glassFillStrong;
 
   static const Color glassBorder = Color(0x1AFFFFFF);

@@ -5,11 +5,8 @@ import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/incident_time_format.dart';
-import 'package:google_hackathon_app/theme/app_liquid_glass.dart';
-import 'package:google_hackathon_app/widgets/ciro_liquid_glass.dart';
 import 'package:google_hackathon_app/widgets/incident_live_beacon.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:intl/intl.dart';
 
 class IncidentCard extends StatelessWidget {
@@ -25,17 +22,19 @@ class IncidentCard extends StatelessWidget {
     final DateTime now = DateTime.now();
     final bool isRecent = IncidentTimeFormat.isWithinLast24Hours(incident.scanDatetime, now);
     final Color borderColor = incident.isUserSubmitted ? AppColors.userSubmitted.withValues(alpha: 0.5) : AppColors.glassBorder;
-    final LiquidGlassSettings glassSettings = incident.isUserSubmitted
-        ? AppLiquidGlass.listTile.copyWith(glassColor: AppColors.userSubmittedBg)
-        : AppLiquidGlass.listTile;
+    final Color bgColor = incident.isUserSubmitted ? AppColors.userSubmittedBg : AppColors.glassPanel;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppDimens.space16, vertical: AppDimens.space6),
-      child: CiroFakeGlassCard(
-        borderRadius: AppDimens.radiusMd,
-        settings: glassSettings,
-        border: Border.all(color: borderColor, width: isRecent ? 1.5 : 1),
-        child: Column(
+      child: Material(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(color: borderColor, width: isRecent ? 1.5 : 1),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InkWell(
@@ -213,6 +212,7 @@ class IncidentCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
       ),
     );
   }

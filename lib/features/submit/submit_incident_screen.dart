@@ -6,8 +6,6 @@ import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/user_reports_api.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
-import 'package:google_hackathon_app/theme/app_liquid_glass.dart';
-import 'package:google_hackathon_app/widgets/ciro_liquid_glass.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SubmitIncidentScreen extends StatefulWidget {
@@ -117,10 +115,13 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CiroFakeGlassCard(
-                settings: AppLiquidGlass.section,
+              Container(
                 padding: EdgeInsets.all(AppDimens.space14),
-                border: Border.all(color: AppColors.glassBorder),
+                decoration: BoxDecoration(
+                  color: AppColors.glassPanel,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                  border: Border.all(color: AppColors.glassBorder),
+                ),
                 child: Row(
                   children: [
                     const Icon(Icons.pin_drop, color: AppColors.mapAccent),
