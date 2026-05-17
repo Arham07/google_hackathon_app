@@ -1,5 +1,4 @@
-import 'package:google_hackathon_app/features/incidents/models/mock_incident.dart';
-import 'package:google_hackathon_app/theme/priority_styles.dart';
+import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 
 /// Hardcoded incidents for Phase 1 UI (Karachi / Pakistan disaster theme).
 final List<MockIncident> mockIncidents = <MockIncident>[

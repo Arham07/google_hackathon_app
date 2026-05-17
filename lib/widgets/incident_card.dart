@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_hackathon_app/features/incidents/models/mock_incident.dart';
+import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +11,7 @@ class IncidentCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final MockIncident incident;
+  final Incident incident;
   final VoidCallback onTap;
 
   @override

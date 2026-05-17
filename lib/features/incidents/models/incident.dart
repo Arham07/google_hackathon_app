@@ -1,5 +1,7 @@
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 
+export 'package:google_hackathon_app/theme/priority_styles.dart' show IncidentPriority;
+
 enum AuthenticityTier {
   verifiedMajorOutlet,
   establishedAccount,
@@ -19,8 +21,8 @@ extension AuthenticityTierX on AuthenticityTier {
   }
 }
 
-class MockIncident {
-  const MockIncident({
+class Incident {
+  const Incident({
     required this.id,
     required this.title,
     required this.category,
@@ -33,6 +35,7 @@ class MockIncident {
     required this.summary,
     required this.precautions,
     required this.resources,
+    this.address,
     this.isUserSubmitted = false,
     this.authenticity = AuthenticityTier.establishedAccount,
     this.thumbnailUrl,
@@ -43,6 +46,7 @@ class MockIncident {
   final String category;
   final String city;
   final String area;
+  final String? address;
   final double latitude;
   final double longitude;
   final IncidentPriority priority;
@@ -54,5 +58,14 @@ class MockIncident {
   final AuthenticityTier authenticity;
   final String? thumbnailUrl;
 
-  String get locationLabel => '$area, $city';
+  String get locationLabel {
+    if (address != null && address!.isNotEmpty) {
+      return address!;
+    }
+    if (area.isNotEmpty) return '$area, $city';
+    return city;
+  }
 }
+
+/// Backward-compatible alias for mock data files.
+typedef MockIncident = Incident;

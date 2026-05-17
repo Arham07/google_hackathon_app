@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:google_hackathon_app/core/api/api_exception.dart';
+import 'package:google_hackathon_app/core/api/user_reports_api.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
+import 'package:image_picker/image_picker.dart';
 
-/// Demo submit flow — fixed coordinates, mock success (no API).
 class SubmitIncidentScreen extends StatefulWidget {
   const SubmitIncidentScreen({super.key});
 
@@ -21,6 +22,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   final TextEditingController _cityController = TextEditingController(text: 'Karachi');
   final TextEditingController _areaController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
+  final UserReportsApi _reportsApi = UserReportsApi();
+
   XFile? _photo;
   bool _submitting = false;
 
@@ -42,33 +45,61 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
-    await Future<void>.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    setState(() => _submitting = false);
 
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Report received'),
-          content: const Text(
-            'Thank you. Your incident report was recorded (demo — no server call). '
-            'Authorities may verify and publish an alert.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _textController.clear();
-                _areaController.clear();
-                setState(() => _photo = null);
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+    try {
+      final UserReportSubmitResponse result = await _reportsApi.submitReport(
+        text: _textController.text.trim(),
+        lat: SubmitIncidentScreen.demoLat,
+        lng: SubmitIncidentScreen.demoLng,
+        city: _cityController.text.trim(),
+        area: _areaController.text.trim(),
+        photoPath: _photo?.path,
+      );
+
+      if (!mounted) return;
+      setState(() => _submitting = false);
+
+      final String message = result.isDuplicate
+          ? 'A similar report already exists nearby.'
+          : result.eventId != null
+              ? 'Thank you. Report submitted (ID: ${result.eventId!.substring(0, 24)}…).'
+              : 'Thank you. Your incident report was received.';
+
+      await showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(result.isDuplicate ? 'Duplicate report' : 'Report received'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  if (!result.isDuplicate) {
+                    _textController.clear();
+                    _areaController.clear();
+                    setState(() => _photo = null);
+                  }
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Submit failed. Check server and try again.')),
+      );
+    }
   }
 
   @override
