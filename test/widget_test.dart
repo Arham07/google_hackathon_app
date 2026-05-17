@@ -1,11 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_hackathon_app/main.dart';
+import 'package:google_hackathon_app/app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('App loads map screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
-    await tester.pump();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    expect(find.text('Karachi flood alerts'), findsOneWidget);
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
+
+  testWidgets('App shows onboarding first', (WidgetTester tester) async {
+    await tester.pumpWidget(const CiroApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pakistan needs you prepared'), findsOneWidget);
   });
 }
