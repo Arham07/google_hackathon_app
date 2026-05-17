@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/config/app_assets.dart';
 import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/events_api.dart';
+import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
-import 'package:google_hackathon_app/features/map/incident_map_screen.dart';
 import 'package:google_hackathon_app/models/api_event.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/utils/external_url.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class IncidentDetailScreen extends StatefulWidget {
   const IncidentDetailScreen({super.key, required this.incident});
@@ -173,19 +174,12 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.mapAccent,
         onPressed: _incident.hasMapCoordinates
             ? () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => IncidentMapScreen(
-                latitude: _incident.mapLatitude,
-                longitude: _incident.mapLongitude,
-                title: _incident.title,
-              ),
-            ),
-          );
-        }
+                context.read<IncidentsController>().requestMapFocus(_incident, switchToMapTab: true);
+                Navigator.of(context).pop();
+              }
             : null,
         icon: const Icon(
           Icons.map,

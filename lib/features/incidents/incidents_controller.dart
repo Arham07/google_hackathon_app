@@ -33,6 +33,11 @@ class IncidentsController extends ChangeNotifier {
   /// When set, [MapTabScreen] should fly the camera here and show the peek card.
   Incident? pendingMapFocus;
 
+  bool _switchToMapTabPending = false;
+
+  /// One-shot: [MainShell] switches bottom navigation to the Map tab, then clears via [clearSwitchToMapTabPending].
+  bool get switchToMapTabPending => _switchToMapTabPending;
+
   /// Incidents with valid coordinates for map markers.
   List<Incident> get mapEventsWithCoordinates => mapEvents
       .where((Incident i) => i.latitude != 0 || i.longitude != 0)
@@ -68,9 +73,16 @@ class IncidentsController extends ChangeNotifier {
     }
   }
 
-  void requestMapFocus(Incident incident) {
+  void requestMapFocus(Incident incident, {bool switchToMapTab = false}) {
     pendingMapFocus = incident;
+    if (switchToMapTab) {
+      _switchToMapTabPending = true;
+    }
     notifyListeners();
+  }
+
+  void clearSwitchToMapTabPending() {
+    _switchToMapTabPending = false;
   }
 
   void clearPendingMapFocus() {

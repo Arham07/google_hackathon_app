@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/auth/login_screen.dart';
 import 'package:google_hackathon_app/features/home/main_shell.dart';
+import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/onboarding/onboarding_screen.dart';
 import 'package:google_hackathon_app/theme/app_theme.dart';
+import 'package:provider/provider.dart';
 
 enum _AppGate { loading, onboarding, login, home }
 
@@ -52,18 +54,22 @@ class _CiroAppState extends State<CiroApp> {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
-          title: 'CIRO Alerts',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme(),
-          home: switch (_gate) {
-            _AppGate.loading => const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              ),
-            _AppGate.onboarding => OnboardingScreen(onFinished: _goLogin),
-            _AppGate.login => LoginScreen(onLoggedIn: _goHome),
-            _AppGate.home => MainShell(onLogout: _goLoginFromHome),
-          },
+        return ChangeNotifierProvider<IncidentsController>(
+          key: ValueKey<String>(_gate == _AppGate.home ? 'shell' : 'auth'),
+          create: (_) => IncidentsController(),
+          child: MaterialApp(
+            title: 'CIRO Alerts',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.darkTheme(),
+            home: switch (_gate) {
+              _AppGate.loading => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+              _AppGate.onboarding => OnboardingScreen(onFinished: _goLogin),
+              _AppGate.login => LoginScreen(onLoggedIn: _goHome),
+              _AppGate.home => MainShell(onLogout: _goLoginFromHome),
+            },
+          ),
         );
       },
     );
