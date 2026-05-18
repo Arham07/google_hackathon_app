@@ -6,6 +6,7 @@ import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/user_reports_api.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SubmitIncidentScreen extends StatefulWidget {
@@ -130,17 +131,13 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Demo location (fixed)',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: AppColors.mutedForeground,
-                                ),
+                            style: AppTextStyles.caption,
                           ),
                           Text(
                             '${SubmitIncidentScreen.demoLat}, ${SubmitIncidentScreen.demoLng}',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontFamily: 'monospace',
-                                ),
+                            style: AppTextStyles.mono,
                           ),
                         ],
                       ),

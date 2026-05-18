@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
-import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key, required this.onSignedUp});
@@ -48,11 +48,9 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
+                const Text(
                   'Join the community alert network',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.mutedForeground,
-                      ),
+                  style: AppTextStyles.screenSubtitle,
                 ),
                 SizedBox(height: AppDimens.space24),
                 TextFormField(

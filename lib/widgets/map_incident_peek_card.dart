@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
 
@@ -22,7 +23,6 @@ class MapIncidentPeekCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       child: BackdropFilter(
@@ -69,21 +69,21 @@ class MapIncidentPeekCard extends StatelessWidget {
                   ),
                   Text(
                     incident.title,
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                    style: AppTextStyles.peekTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: AppDimens.space6),
                   Text(
                     incident.locationLabel,
-                    style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
+                    style: AppTextStyles.bodyMuted,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: AppDimens.space4),
                   Text(
                     DateFormat('dd MMM yyyy, HH:mm').format(incident.scanDatetime),
-                    style: theme.textTheme.labelSmall?.copyWith(color: AppColors.mutedForeground),
+                    style: AppTextStyles.caption,
                   ),
                   SizedBox(height: AppDimens.space8),
                   Align(

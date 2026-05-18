@@ -3,6 +3,7 @@ import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/auth/signup_screen.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLoggedIn});
@@ -53,20 +54,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: AppColors.mapAccent,
                 ),
                 SizedBox(height: AppDimens.space16),
-                Text(
+                const Text(
                   'CIRO Alerts',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: AppTextStyles.screenTitle,
                 ),
                 SizedBox(height: AppDimens.space8),
-                Text(
+                const Text(
                   'Sign in to continue (demo — any valid email works)',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.mutedForeground,
-                      ),
+                  style: AppTextStyles.screenSubtitle,
                 ),
                 SizedBox(height: AppDimens.space40),
                 TextFormField(

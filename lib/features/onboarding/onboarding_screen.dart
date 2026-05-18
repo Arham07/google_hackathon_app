@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.onFinished});
@@ -142,18 +143,13 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: AppTextStyles.screenTitle,
           ),
           SizedBox(height: AppDimens.space16),
           Text(
             body,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.mutedForeground,
-                  height: 1.5,
-                ),
+            style: AppTextStyles.screenSubtitle.copyWith(height: 1.5),
           ),
         ],
       ),

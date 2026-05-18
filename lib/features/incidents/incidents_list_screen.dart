@@ -121,9 +121,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               Text(
                 controller.errorMessage!,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                style: AppTextStyles.emptyState,
               ),
               SizedBox(height: AppDimens.space16),
               FilledButton.icon(
@@ -145,9 +143,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
           controller.activePriorityFilters.isNotEmpty
               ? 'No incidents match selected priorities'
               : 'No incidents found',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: AppTextStyles.emptyState,
         ),
       );
     }

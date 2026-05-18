@@ -38,7 +38,7 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTextStyles.alertsTitle.copyWith(fontSize: 22.sp),
+        titleTextStyle: AppTextStyles.alertsTitle.copyWith(fontSize: 20.sp),
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
@@ -55,7 +55,9 @@ abstract final class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceElevated,
-        hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+        hintStyle: AppTextStyles.bodyMuted,
+        labelStyle: AppTextStyles.bodySecondary,
+        floatingLabelStyle: AppTextStyles.body.copyWith(color: AppColors.mapAccent),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           borderSide: const BorderSide(color: AppColors.border),
@@ -135,19 +137,19 @@ abstract final class AppTheme {
         style?.copyWith(fontSize: size.sp, height: style.height);
 
     return base.copyWith(
-      displayLarge: s(base.displayLarge, 57),
-      displayMedium: s(base.displayMedium, 45),
-      displaySmall: s(base.displaySmall, 36),
-      headlineLarge: s(base.headlineLarge, 32),
-      headlineMedium: s(base.headlineMedium, 28),
-      headlineSmall: s(base.headlineSmall, 24),
-      titleLarge: s(base.titleLarge, 22),
-      titleMedium: s(base.titleMedium, 16),
-      titleSmall: s(base.titleSmall, 14),
-      bodyLarge: s(base.bodyLarge, 16),
-      bodyMedium: s(base.bodyMedium, 14),
+      displayLarge: s(base.displayLarge, 48),
+      displayMedium: s(base.displayMedium, 40),
+      displaySmall: s(base.displaySmall, 32),
+      headlineLarge: s(base.headlineLarge, 26),
+      headlineMedium: s(base.headlineMedium, 20),
+      headlineSmall: s(base.headlineSmall, 18),
+      titleLarge: s(base.titleLarge, 18),
+      titleMedium: s(base.titleMedium, 14),
+      titleSmall: s(base.titleSmall, 13),
+      bodyLarge: s(base.bodyLarge, 14),
+      bodyMedium: s(base.bodyMedium, 13),
       bodySmall: s(base.bodySmall, 12),
-      labelLarge: s(base.labelLarge, 14),
+      labelLarge: s(base.labelLarge, 13),
       labelMedium: s(base.labelMedium, 12),
       labelSmall: s(base.labelSmall, 11),
     );

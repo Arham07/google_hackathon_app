@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/features/incidents/data/mock_incidents.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 
 class StatusScreen extends StatelessWidget {
@@ -40,11 +41,9 @@ class StatusScreen extends StatelessWidget {
             color: AppColors.chart2,
           ),
           SizedBox(height: AppDimens.space24),
-          Text(
+          const Text(
             'By priority (feed)',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTextStyles.sectionTitle,
           ),
           SizedBox(height: AppDimens.space12),
           SizedBox(
@@ -52,11 +51,9 @@ class StatusScreen extends StatelessWidget {
             child: _PriorityBarChart(counts: byPriority),
           ),
           SizedBox(height: AppDimens.space24),
-          Text(
+          const Text(
             'By city (feed)',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTextStyles.sectionTitle,
           ),
           SizedBox(height: AppDimens.space12),
           SizedBox(
@@ -64,12 +61,9 @@ class StatusScreen extends StatelessWidget {
             child: _CityPieChart(counts: byCity),
           ),
           SizedBox(height: AppDimens.space16),
-          Text(
+          const Text(
             'Demo data only — connect API in a later phase for live aggregates.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.mutedForeground,
-                  fontStyle: FontStyle.italic,
-                ),
+            style: AppTextStyles.sectionBodyMuted,
           ),
         ],
       ),
@@ -116,15 +110,11 @@ class _StatCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.mutedForeground,
-                      ),
+                  style: AppTextStyles.statLabel,
                 ),
                 Text(
                   value,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: AppTextStyles.statValue,
                 ),
               ],
             ),
@@ -168,10 +158,7 @@ class _PriorityBarChart extends StatelessWidget {
                   padding: EdgeInsets.only(top: AppDimens.space8),
                   child: Text(
                     order[i].label.substring(0, 1),
-                    style: TextStyle(
-                      fontSize: AppDimens.font10,
-                      color: AppColors.mutedForeground,
-                    ),
+                    style: AppTextStyles.chartAxis,
                   ),
                 );
               },
@@ -236,8 +223,7 @@ class _CityPieChart extends StatelessWidget {
             title: '${entry.key}\n${entry.value}',
             color: _colors[i % _colors.length],
             radius: 50.r,
-            titleStyle: TextStyle(
-              fontSize: AppDimens.font10,
+            titleStyle: AppTextStyles.chartAxis.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

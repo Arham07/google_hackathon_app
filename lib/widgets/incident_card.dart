@@ -8,7 +8,7 @@ import 'package:google_hackathon_app/theme/priority_styles.dart';
 import 'package:google_hackathon_app/utils/incident_time_format.dart';
 import 'package:intl/intl.dart';
 
-/// Refactored alert incident card for CIRO Alerts list.
+/// Refactored compact alert incident card for CIRO Alerts list.
 class IncidentCard extends StatelessWidget {
   const IncidentCard({super.key, required this.incident, required this.onTap, this.onOpenOnMap});
 
@@ -19,10 +19,11 @@ class IncidentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppDimens.space16, vertical: AppDimens.space6),
+      // Padding reduced vertically from space6 to 4 to stack cards tightly
+      padding: EdgeInsets.symmetric(horizontal: AppDimens.space16, vertical: 4),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12), // Slightly sharper corners for compact look
           color: AppColors.surface,
           border: Border.all(color: AppColors.glassBorder),
         ),
@@ -43,7 +44,7 @@ class IncidentCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Map header (~40% visual weight via aspect ratio)
+// Map header (~25% height reduction via aspect ratio)
 // ---------------------------------------------------------------------------
 
 class _MapHeader extends StatelessWidget {
@@ -52,13 +53,13 @@ class _MapHeader extends StatelessWidget {
   final Incident incident;
 
   bool get _isActive => IncidentTimeFormat.isWithinLast24Hours(incident.scanDatetime, DateTime.now());
-
   bool get _isVerified => incident.authenticity == AuthenticityTier.verifiedMajorOutlet;
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 2,
+      // Changed from 2 to 2.6 to make the image landscape-shallow (saves huge vertical space)
+      aspectRatio: 2.6,
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -67,31 +68,27 @@ class _MapHeader extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            height: 72,
-            child:DecoratedBox(
+            height: 45, // Reduced gradient height to match shallow image
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   stops: const [0.0, 0.5, 1.0],
-                  colors: [
-                    AppColors.surface.withValues(alpha: 0.0),
-                    AppColors.surface.withValues(alpha: 0.55),
-                    AppColors.surface,
-                  ],
+                  colors: [AppColors.surface.withValues(alpha: 0.0), AppColors.surface.withValues(alpha: 0.55), AppColors.surface],
                 ),
               ),
             ),
           ),
-          if (_isVerified) Positioned(top: AppDimens.space10, left: AppDimens.space10, child: _AuthorityBadge()),
+          if (_isVerified) Positioned(top: AppDimens.space8, left: AppDimens.space8, child: _AuthorityBadge()),
           Positioned(
-            top: AppDimens.space10,
-            right: AppDimens.space10,
+            top: AppDimens.space8,
+            right: AppDimens.space8,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 _CategoryIcons(category: incident.category),
-                if (_isActive) ...<Widget>[SizedBox(width: AppDimens.space8), const _ActiveBadge()],
+                if (_isActive) ...<Widget>[SizedBox(width: AppDimens.space6), const _ActiveBadge()],
               ],
             ),
           ),
@@ -115,7 +112,8 @@ class _MapBackground extends StatelessWidget {
           Image.network(
             thumbnailUrl!,
             fit: BoxFit.cover,
-            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) => const _VectorMapPattern(),
+            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) =>
+                Image.asset('assets/images/incident_thumbnail_placeholder.jpeg', fit: BoxFit.cover),
           )
         else
           Image.asset('assets/images/incident_thumbnail_placeholder.jpeg', fit: BoxFit.cover),
@@ -135,76 +133,12 @@ class _MapBackground extends StatelessWidget {
   }
 }
 
-class _VectorMapPattern extends StatelessWidget {
-  const _VectorMapPattern();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _MinimalMapPainter(),
-      child: Container(color: const Color(0xFF151D28)),
-    );
-  }
-}
-
-class _MinimalMapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint grid = Paint()
-      ..color = AppColors.textSecondary.withValues(alpha: 0.12)
-      ..strokeWidth = 1;
-
-    const double step = 28;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
-    }
-
-    final Paint road = Paint()
-      ..color = AppColors.textSecondary.withValues(alpha: 0.22)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke;
-
-    final Path path = Path()
-      ..moveTo(size.width * 0.08, size.height * 0.72)
-      ..quadraticBezierTo(size.width * 0.42, size.height * 0.38, size.width * 0.92, size.height * 0.58);
-    canvas.drawPath(path, road);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _ThreatFocalPoint extends StatelessWidget {
-  const _ThreatFocalPoint({required this.priority});
-
-  final IncidentPriority priority;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color core = priority == IncidentPriority.unknown ? AppColors.priorityHigh : priority.color;
-
-    return Container(
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: core,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 2),
-        boxShadow: <BoxShadow>[BoxShadow(color: core.withValues(alpha: 0.65), blurRadius: 10, spreadRadius: 2)],
-      ),
-    );
-  }
-}
-
 class _AuthorityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 168),
-      padding: EdgeInsets.symmetric(horizontal: AppDimens.space8, vertical: AppDimens.space6),
+      constraints: const BoxConstraints(maxWidth: 150),
+      padding: EdgeInsets.symmetric(horizontal: AppDimens.space6, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
@@ -216,16 +150,16 @@ class _AuthorityBadge extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
-              Icon(Icons.shield_outlined, size: 18, color: AppColors.textSecondary),
-              Positioned(right: -4, top: -4, child: Icon(Icons.star_rounded, size: 12, color: AppColors.authorityAccent)),
+              Icon(Icons.shield_outlined, size: 14, color: AppColors.textSecondary),
+              Positioned(right: -3, top: -3, child: Icon(Icons.star_rounded, size: 10, color: AppColors.authorityAccent)),
             ],
           ),
-          SizedBox(width: AppDimens.space6),
+          SizedBox(width: AppDimens.space4),
           Flexible(
             child: Text(
               'Authority Verified',
-              style: AppTextStyles.authorityLabel.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-              maxLines: 2,
+              style: AppTextStyles.authorityLabel.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 9),
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -261,7 +195,7 @@ class _CategoryIcons extends StatelessWidget {
           .map(
             (IconData icon) => Padding(
               padding: EdgeInsets.only(left: AppDimens.space4),
-              child: Icon(icon, size: 18, color: AppColors.textPrimary),
+              child: Icon(icon, size: 16, color: AppColors.textPrimary),
             ),
           )
           .toList(),
@@ -275,19 +209,19 @@ class _ActiveBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppDimens.space8, vertical: AppDimens.space4),
+      padding: EdgeInsets.symmetric(horizontal: AppDimens.space6, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         border: Border.all(color: AppColors.priorityCritical.withValues(alpha: 0.55)),
       ),
-      child: Text('ACTIVE', style: AppTextStyles.activeBadge),
+      child: Text('ACTIVE', style: AppTextStyles.activeBadge.copyWith(fontSize: 9)),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Core incident details
+// Core incident details (Optimized spacings)
 // ---------------------------------------------------------------------------
 
 class _IncidentDetails extends StatelessWidget {
@@ -301,7 +235,8 @@ class _IncidentDetails extends StatelessWidget {
     final String dateTime = DateFormat('dd MMM yyyy, hh:mm a').format(incident.scanDatetime);
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(AppDimens.space14, AppDimens.space12, AppDimens.space14, AppDimens.space8),
+      // Reduced top from 12->8 and bottom from 8->6
+      padding: EdgeInsets.fromLTRB(AppDimens.space12, AppDimens.space8, AppDimens.space12, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -309,62 +244,63 @@ class _IncidentDetails extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              SizedBox(
-                width: 250.w,
-                child: Text.rich(
-                  TextSpan(
-                    children: [TextSpan(text: incident.title, style: AppTextStyles.incidentTitle)],
+              Expanded(
+                // Replaced fixed width (250.w) with Expanded to prevent text clipping horizontally
+                child: Padding(
+                  padding: EdgeInsets.only(right: 8.w),
+                  child: Text(
+                    incident.title,
+                    style: CompactCardTextStyles.incidentTitle,
+                    maxLines: 2, // 3 lines is too text-heavy for a small card, capped at 2
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-
               _SeverityBadge(priority: incident.priority),
             ],
           ),
-          SizedBox(height: AppDimens.space10),
-          Text(
-            '$dateTime',
-            style: AppTextStyles.incidentTitle.copyWith(
-              fontSize: 12, // smaller size
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          SizedBox(height: AppDimens.space10),
+          SizedBox(height: 4), // 10 -> 4
+          Text(dateTime, style: CompactCardTextStyles.bodySecondary.copyWith(fontSize: 11, fontWeight: FontWeight.w400)),
+          SizedBox(height: 6), // 10 -> 6
 
           Divider(height: 1, color: AppColors.glassBorder),
 
-          if (incident.isUserSubmitted) ...<Widget>[SizedBox(height: AppDimens.space8), _CitizenReportTag()],
-          SizedBox(height: AppDimens.space10),
+          if (incident.isUserSubmitted) ...<Widget>[SizedBox(height: 4), _CitizenReportTag()],
+          SizedBox(height: 6), // 10 -> 6
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Icon(Icons.location_on_outlined, size: AppDimens.iconSm, color: AppColors.textSecondary),
-              SizedBox(width: AppDimens.space6),
+              Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
+              SizedBox(width: 4),
               Expanded(
-                child: Text(incident.locationLabel, style: AppTextStyles.bodySecondary, maxLines: 3, overflow: TextOverflow.ellipsis),
+                child: Text(
+                  incident.locationLabel,
+                  style: CompactCardTextStyles.bodySecondary,
+                  maxLines: 2, // 3 -> 2 lines restriction for tight view
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (onOpenOnMap != null && incident.hasMapCoordinates)
-                Column(
-                  children: [
-                    _ShowOnMapLink(onTap: onOpenOnMap!),
-                    SizedBox(height: 5.h),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 0),
-                          child: Icon(Icons.schedule_outlined, size: AppDimens.iconXs, color: const Color(0xFFFCA5A5)),
-                        ),
-                        SizedBox(width: AppDimens.space4),
-                        Text(
-                          IncidentTimeFormat.relativeAge(incident.scanDatetime, DateTime.now()),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: const Color(0xFFFCA5A5), fontWeight: FontWeight.w600),
-                        ),
-                        // _ImpactMetricsGrid(incident: incident),
-                      ],
-                    ),
-                  ],
+                Padding(
+                  padding: EdgeInsets.only(left: 4.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _ShowOnMapLink(onTap: onOpenOnMap!),
+                      SizedBox(height: 3.h),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.schedule_outlined, size: 11, color: const Color(0xFFFCA5A5)),
+                          SizedBox(width: 3),
+                          Text(
+                            IncidentTimeFormat.relativeAge(incident.scanDatetime, DateTime.now()),
+                            style: AppTextStyles.riskHighlight,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

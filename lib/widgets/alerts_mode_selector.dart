@@ -91,8 +91,7 @@ class _ModeSegment extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.metricValue.copyWith(
-                    fontSize: 13,
+                  style: AppTextStyles.segmentLabel.copyWith(
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                     color: selected ? AppColors.textPrimary : AppColors.textSecondary,
                   ),

@@ -7,6 +7,7 @@ import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/models/api_event.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 import 'package:google_hackathon_app/utils/external_url.dart';
 import 'package:google_hackathon_app/widgets/priority_chip.dart';
 import 'package:intl/intl.dart';
@@ -66,8 +67,6 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Incident details')),
       body: SafeArea(
@@ -100,10 +99,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   Expanded(
                     child: Text(
                       _incident.authenticity.label,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.chart2,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: DetailTextStyles.authenticity,
                     ),
                   ),
                 ],
@@ -121,32 +117,29 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               SizedBox(height: AppDimens.space12),
               Text(
                 _incident.title,
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: DetailTextStyles.title,
               ),
               SizedBox(height: AppDimens.space8),
               Text(
                 _incident.locationLabel,
-                style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground),
+                style: DetailTextStyles.meta,
               ),
               if (_incident.area.isNotEmpty)
                 Text(
                   '${_incident.area}, ${_incident.city}',
-                  style: theme.textTheme.bodySmall?.copyWith(color: AppColors.mutedForeground),
+                  style: DetailTextStyles.metaSmall,
                 ),
               SizedBox(height: AppDimens.space4),
               Text(
                 DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
-                style: theme.textTheme.labelSmall?.copyWith(color: AppColors.mutedForeground),
+                style: DetailTextStyles.metaSmall,
               ),
               if (_incident.hasMapCoordinates) ...[
                 SizedBox(height: AppDimens.space6),
                 Text(
                   'Coordinates: ${_incident.mapLatitude.toStringAsFixed(6)}, '
                   '${_incident.mapLongitude.toStringAsFixed(6)}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.mapAccent,
-                    fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-                  ),
+                  style: DetailTextStyles.accentMeta,
                 ),
               ],
               SizedBox(height: AppDimens.space20),
@@ -155,7 +148,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   padding: EdgeInsets.only(bottom: AppDimens.space12),
                   child: LinearProgressIndicator(minHeight: 2),
                 ),
-              Text(_incident.summary, style: theme.textTheme.bodyLarge),
+              Text(_incident.summary, style: DetailTextStyles.summary),
               if (_incident.sourceTrail.isNotEmpty) ...[
                 SizedBox(height: AppDimens.space24),
                 ..._incident.sourceTrail.map(_buildSourceTrailSection),
@@ -280,7 +273,7 @@ class _TagChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         border: Border.all(color: AppColors.tacticalBorder),
       ),
-      child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w500)),
+      child: Text(label, style: DetailTextStyles.tag),
     );
   }
 }
@@ -292,7 +285,6 @@ class _WeatherSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final List<String> lines = <String>[
       if (weather.condition != null) 'Now: ${weather.condition}',
       if (weather.tempC != null) 'Temperature: ${weather.tempC!.toStringAsFixed(1)} °C',
@@ -314,7 +306,7 @@ class _WeatherSection extends StatelessWidget {
               .map(
                 (String line) => Padding(
                   padding: EdgeInsets.only(bottom: AppDimens.space6),
-                  child: Text(line, style: theme.textTheme.bodyMedium),
+                  child: Text(line, style: DetailTextStyles.sectionBody),
                 ),
               )
               .toList(),
@@ -331,8 +323,6 @@ class _NewsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
     return Padding(
       padding: EdgeInsets.only(bottom: AppDimens.space16),
       child: _InfoCard(
@@ -369,20 +359,13 @@ class _NewsSection extends StatelessWidget {
                         if (article.thumbnailUrl != null) SizedBox(height: AppDimens.space8),
                         Text(
                           article.headline,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: canOpen ? AppColors.mapAccent : null,
-                            decoration: canOpen ? TextDecoration.underline : null,
-                            decorationColor: AppColors.mapAccent,
-                          ),
+                          style: canOpen ? DetailTextStyles.newsHeadlineLink : DetailTextStyles.newsHeadline,
                         ),
                         if (article.publishedAt != null) ...[
                           SizedBox(height: AppDimens.space4),
                           Text(
                             article.publishedAt!,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.mutedForeground,
-                            ),
+                            style: DetailTextStyles.newsDate,
                           ),
                         ],
                         if (canOpen) ...[
@@ -427,14 +410,9 @@ class _InfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: AppDimens.iconLg, color: AppColors.mapAccent),
+              Icon(icon, size: AppDimens.iconMd, color: AppColors.mapAccent),
               SizedBox(width: AppDimens.space8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              Text(title, style: DetailTextStyles.sectionTitle),
             ],
           ),
           SizedBox(height: AppDimens.space12),
@@ -467,14 +445,9 @@ class _Section extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: AppDimens.iconLg, color: AppColors.mapAccent),
+              Icon(icon, size: AppDimens.iconMd, color: AppColors.mapAccent),
               SizedBox(width: AppDimens.space8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              Text(title, style: DetailTextStyles.sectionTitle),
             ],
           ),
           SizedBox(height: AppDimens.space12),
@@ -484,13 +457,12 @@ class _Section extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (!isPlaceholder) const Text('• ', style: TextStyle(color: AppColors.mutedForeground)),
+                  if (!isPlaceholder)
+                    const Text('• ', style: AppTextStyles.sectionBodyMuted),
                   Expanded(
                     child: Text(
                       item,
-                      style: isPlaceholder
-                          ? Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.mutedForeground, fontStyle: FontStyle.italic)
-                          : null,
+                      style: isPlaceholder ? DetailTextStyles.sectionBodyMuted : DetailTextStyles.sectionBody,
                     ),
                   ),
                 ],

@@ -7,6 +7,7 @@ import 'package:google_hackathon_app/models/place_suggestion.dart';
 import 'package:google_hackathon_app/services/places_search_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
 
 class MapSearchBar extends StatefulWidget {
   const MapSearchBar({
@@ -195,7 +196,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
                           leading: const Icon(Icons.info_outline),
                           title: Text(
                             _error!,
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: AppTextStyles.bodyMuted,
                           ),
                         )
                       : ListView.separated(
@@ -212,6 +213,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
                                 item.description,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.bodySecondary,
                               ),
                               onTap: () => _selectSuggestion(item),
                             );
