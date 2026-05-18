@@ -31,10 +31,10 @@ class _IncidentLiveBeaconState extends State<IncidentLiveBeacon> with SingleTick
         height: 10,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFFEF4444),
+          color: const Color(0xFFFF4444),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: const Color(0xFFEF4444).withValues(alpha: 0.75),
+              color: const Color(0xFFFF4444).withValues(alpha: 0.75),
               blurRadius: 8,
               spreadRadius: 1,
             ),

@@ -71,6 +71,7 @@ flutter:
 
   assets:
     - assets/images/incident_thumbnail_placeholder.png
+    - assets/images/incident_thumbnail_placeholder.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -30,6 +30,9 @@ class IncidentsController extends ChangeNotifier {
   String? errorMessage;
   String? mapEventsError;
 
+  /// Bumped on each [load]; stale responses are ignored after tab/mode switches.
+  int _loadGeneration = 0;
+
   /// When set, [MapTabScreen] should fly the camera here and show the peek card.
   Incident? pendingMapFocus;
 
@@ -52,26 +55,37 @@ class IncidentsController extends ChangeNotifier {
   }
 
   Future<void> load() async {
+    final int generation = ++_loadGeneration;
     isLoading = true;
     errorMessage = null;
     notifyListeners();
 
     try {
       final EventsListResponse response = await _fetchForMode();
-      _allIncidents = incidentsFromApiList(response.events);
-      nearestArea = response.nearestArea;
-      errorMessage = null;
+      if (!_isStaleLoad(generation)) {
+        _allIncidents = incidentsFromApiList(response.events);
+        nearestArea = response.nearestArea;
+        errorMessage = null;
+      }
     } on ApiException catch (e) {
-      errorMessage = e.message;
-      _allIncidents = <Incident>[];
+      if (!_isStaleLoad(generation)) {
+        errorMessage = e.message;
+        _allIncidents = <Incident>[];
+      }
     } catch (_) {
-      errorMessage = 'Failed to load incidents';
-      _allIncidents = <Incident>[];
-    } finally {
+      if (!_isStaleLoad(generation)) {
+        errorMessage = 'Failed to load incidents';
+        _allIncidents = <Incident>[];
+      }
+    }
+
+    if (!_isStaleLoad(generation)) {
       isLoading = false;
       notifyListeners();
     }
   }
+
+  bool _isStaleLoad(int generation) => generation != _loadGeneration;
 
   void requestMapFocus(Incident incident, {bool switchToMapTab = false}) {
     pendingMapFocus = incident;
@@ -97,6 +111,12 @@ class IncidentsController extends ChangeNotifier {
       return;
     }
     mode = newMode;
+    _loadGeneration++;
+    _allIncidents = <Incident>[];
+    nearestArea = null;
+    errorMessage = null;
+    isLoading = true;
+    notifyListeners();
     await load();
   }
 

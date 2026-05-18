@@ -5,8 +5,10 @@ import 'package:google_hackathon_app/features/incidents/incidents_controller.dar
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
-import 'package:google_hackathon_app/theme/priority_styles.dart';
+import 'package:google_hackathon_app/theme/app_text_styles.dart';
+import 'package:google_hackathon_app/widgets/alerts_mode_selector.dart';
 import 'package:google_hackathon_app/widgets/incident_card.dart';
+import 'package:google_hackathon_app/widgets/severity_filter_chip.dart';
 import 'package:provider/provider.dart';
 
 class IncidentsListScreen extends StatefulWidget {
@@ -34,9 +36,11 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
     final IncidentsController controller = context.watch<IncidentsController>();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('CIRO Alerts'),
-        actions: [
+        backgroundColor: AppColors.background,
+        title: const Text('CIRO Alerts', style: AppTextStyles.alertsTitle),
+        actions: <Widget>[
           if (controller.activePriorityFilters.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.filter_alt_off),
@@ -55,7 +59,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+        children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(
               AppDimens.space16,
@@ -63,32 +67,12 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               AppDimens.space16,
               0,
             ),
-            child: SegmentedButton<IncidentListMode>(
-              segments: const [
-                ButtonSegment(
-                  value: IncidentListMode.nearby,
-                  label: Text('Nearby'),
-                  icon: Icon(Icons.near_me_outlined),
-                ),
-                ButtonSegment(
-                  value: IncidentListMode.priority,
-                  label: Text('Priority'),
-                  icon: Icon(Icons.priority_high),
-                ),
-                ButtonSegment(
-                  value: IncidentListMode.all,
-                  label: Text('All'),
-                  icon: Icon(Icons.list),
-                ),
-              ],
-              selected: <IncidentListMode>{controller.mode},
-              onSelectionChanged: (Set<IncidentListMode> selected) {
-                if (selected.isEmpty) return;
-                controller.setMode(selected.first);
-              },
+            child: AlertsModeSelector(
+              mode: controller.mode,
+              onModeChanged: controller.setMode,
             ),
           ),
-          SizedBox(height: AppDimens.space8),
+          SizedBox(height: AppDimens.space10),
           SizedBox(
             height: AppDimens.chipRowHeight,
             child: ListView(
@@ -101,19 +85,10 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                     controller.activePriorityFilters.contains(priority);
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppDimens.space4),
-                  child: FilterChip(
-                    label: Text(
-                      priority.label,
-                      style: TextStyle(
-                        color: selected ? priority.color : null,
-                        fontWeight: FontWeight.w600,
-                        fontSize: AppDimens.font11,
-                      ),
-                    ),
+                  child: SeverityFilterChip(
+                    priority: priority,
                     selected: selected,
                     onSelected: (_) => controller.togglePriorityFilter(priority),
-                    selectedColor: priority.color.withValues(alpha: 0.2),
-                    checkmarkColor: priority.color,
                   ),
                 );
               }).toList(),
@@ -125,18 +100,9 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
     );
   }
 
-  String _nearestBanner(IncidentsController controller) {
-    final String area = controller.nearestArea?.area ?? 'your area';
-    final double? km = controller.nearestArea?.distanceKm;
-    if (km != null) {
-      return 'Showing incidents near $area (${km.toStringAsFixed(1)} km away)';
-    }
-    return 'Showing incidents near $area';
-  }
-
   Widget _buildBody(BuildContext context, IncidentsController controller) {
     if (controller.isLoading && controller.visibleIncidents.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: AppColors.mapAccent));
     }
 
     if (controller.errorMessage != null && controller.visibleIncidents.isEmpty) {
@@ -145,17 +111,19 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
           padding: EdgeInsets.all(AppDimens.space24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: <Widget>[
               Icon(
                 Icons.cloud_off,
                 size: AppDimens.iconXl,
-                color: AppColors.mutedForeground,
+                color: AppColors.textSecondary,
               ),
               SizedBox(height: AppDimens.space16),
               Text(
                 controller.errorMessage!,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
               ),
               SizedBox(height: AppDimens.space16),
               FilledButton.icon(
@@ -178,7 +146,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               ? 'No incidents match selected priorities'
               : 'No incidents found',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.mutedForeground,
+                color: AppColors.textSecondary,
               ),
         ),
       );
@@ -186,6 +154,8 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
 
     return RefreshIndicator(
       onRefresh: controller.load,
+      color: AppColors.mapAccent,
+      backgroundColor: AppColors.surface,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.only(top: AppDimens.space8, bottom: AppDimens.space24),

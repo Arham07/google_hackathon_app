@@ -1,65 +1,72 @@
 import 'package:flutter/material.dart';
 
-/// Dark tactical theme anchored on **#040814** with glass-friendly tokens.
+/// CIRO dark tactical palette — deep charcoal navy (no pure black).
 abstract final class AppColors {
-  // Core surfaces (#040814 family)
-  static const Color background = Color(0xFF040814);
-  static const Color surface = Color(0xFF0A1224);
-  static const Color surfaceElevated = Color(0xFF101C32);
-  static const Color surfaceOverlay = Color(0xFF162240);
+  // Surfaces
+  static const Color background = Color(0xFF121822);
+  static const Color surface = Color(0xFF1E2733);
+  static const Color surfaceElevated = Color(0xFF2E3A4D);
+  static const Color filterSelected = Color(0xFF1A2430);
 
-  static const Color foreground = Color(0xFFF4F4F5);
-  static const Color card = surfaceElevated;
-  static const Color cardForeground = foreground;
+  // Text
+  static const Color textPrimary = Color(0xFFF0F0F0);
+  static const Color textSecondary = Color(0xFFB0BBC6);
 
-  /// Glass fills — use with [LiquidGlassSettings.glassColor] (ARGB alpha = strength).
-  static const Color glassFill = Color(0x66040814);
-  static const Color glassFillStrong = Color(0x99040814);
+  /// Legacy aliases used across the app.
+  static const Color foreground = textPrimary;
+  static const Color mutedForeground = textSecondary;
 
-  /// Semi-opaque panel fill for cards and overlays.
-  static const Color glassPanel = glassFillStrong;
+  static const Color card = surface;
+  static const Color cardForeground = textPrimary;
 
-  static const Color glassBorder = Color(0x1AFFFFFF);
-  static const Color glassBorderHighlight = Color(0x33FFFFFF);
-
-  /// Legacy alias.
+  static const Color glassPanel = surface;
+  static const Color glassFill = Color(0x661E2733);
+  static const Color glassFillStrong = surface;
+  static const Color glassBorder = Color(0x33B0BBC6);
+  static const Color glassBorderHighlight = Color(0x4DF0F0F0);
   static const Color tacticalBorder = glassBorder;
 
-  static const Color primary = Color(0xFFE4E4E7);
-  static const Color primaryForeground = Color(0xFF101C32);
+  static const Color authorityAccent = Color(0xFFFFCC00);
 
-  static const Color secondary = Color(0xFF1A2844);
-  static const Color secondaryForeground = foreground;
+  static const Color primary = textPrimary;
+  static const Color primaryForeground = background;
 
-  static const Color muted = Color(0xFF1A2844);
-  static const Color mutedForeground = Color(0xFF94A3B8);
+  static const Color secondary = surfaceElevated;
+  static const Color secondaryForeground = textPrimary;
 
-  static const Color accent = Color(0xFF1E3054);
-  static const Color accentForeground = foreground;
+  static const Color muted = surfaceElevated;
+  static const Color accent = filterSelected;
+  static const Color accentForeground = textPrimary;
 
-  static const Color destructive = Color(0xFFF87171);
+  static const Color destructive = Color(0xFFFF4444);
   static const Color border = glassBorder;
-  static const Color input = Color(0x26FFFFFF);
-  static const Color ring = Color(0xFF64748B);
+  static const Color input = Color(0x332E3A4D);
+  static const Color ring = textSecondary;
 
   // Charts
   static const Color chart1 = Color(0xFF5B7FD4);
-  static const Color chart2 = Color(0xFF34D399);
-  static const Color chart3 = Color(0xFFFBBF24);
+  static const Color chart2 = Color(0xFF44CC44);
+  static const Color chart3 = Color(0xFFFFD700);
   static const Color chart4 = Color(0xFFC084FC);
-  static const Color chart5 = Color(0xFFFB923C);
+  static const Color chart5 = Color(0xFFFF9933);
 
-  // Priority
-  static const Color priorityCritical = Color(0xFFEF4444);
-  static const Color priorityHigh = Color(0xFFF97316);
-  static const Color priorityMedium = Color(0xFFEAB308);
-  static const Color priorityLow = Color(0xFF10B981);
+  // Severity (primary + border)
+  static const Color priorityCritical = Color(0xFFFF4444);
+  static const Color priorityCriticalBorder = Color(0xFFA16666);
+
+  static const Color priorityHigh = Color(0xFFFF9933);
+  static const Color priorityHighBorder = Color(0xFFA67C55);
+
+  static const Color priorityMedium = Color(0xFFFFD700);
+  static const Color priorityMediumBorder = Color(0xFF998B55);
+
+  static const Color priorityLow = Color(0xFF44CC44);
+  static const Color priorityLowBorder = Color(0xFF66A166);
 
   static const Color userSubmitted = Color(0xFFA78BFA);
-  static const Color userSubmittedBg = Color(0x402C1D4D);
+  static const Color userSubmittedBg = Color(0x402E3A4D);
 
-  /// Links, map actions, focus rings — readable on #040814 surfaces.
-  static const Color mapAccent = Color(0xFF60A5FA);
+  static const Color mapAccent = Color(0xFF7EB6FF);
 
   static const double radius = 10;
 }

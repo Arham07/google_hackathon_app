@@ -16,8 +16,8 @@ class PriorityChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: priority.backgroundColor,
-        borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        border: Border.all(color: priority.color.withValues(alpha: 0.5)),
+        borderRadius: BorderRadius.circular(AppDimens.radiusPill),
+        border: Border.all(color: priority.borderColor, width: 1.5),
       ),
       child: Text(
         priority.label,

@@ -19,6 +19,22 @@ extension IncidentPriorityX on IncidentPriority {
     }
   }
 
+  /// Pill label on incident cards (e.g. "High Priority").
+  String get badgeLabel {
+    switch (this) {
+      case IncidentPriority.critical:
+        return 'Critical';
+      case IncidentPriority.high:
+        return 'High Priority';
+      case IncidentPriority.medium:
+        return 'Medium';
+      case IncidentPriority.low:
+        return 'Low';
+      case IncidentPriority.unknown:
+        return 'Unknown';
+    }
+  }
+
   Color get color {
     switch (this) {
       case IncidentPriority.critical:
@@ -34,7 +50,22 @@ extension IncidentPriorityX on IncidentPriority {
     }
   }
 
-  Color get backgroundColor => color.withValues(alpha: 0.15);
+  Color get borderColor {
+    switch (this) {
+      case IncidentPriority.critical:
+        return AppColors.priorityCriticalBorder;
+      case IncidentPriority.high:
+        return AppColors.priorityHighBorder;
+      case IncidentPriority.medium:
+        return AppColors.priorityMediumBorder;
+      case IncidentPriority.low:
+        return AppColors.priorityLowBorder;
+      case IncidentPriority.unknown:
+        return AppColors.glassBorder;
+    }
+  }
+
+  Color get backgroundColor => color.withValues(alpha: 0.12);
 
   static IncidentPriority fromString(String? value) {
     switch (value?.toUpperCase()) {
