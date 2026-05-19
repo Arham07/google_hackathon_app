@@ -4,7 +4,7 @@ import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
 
-/// Fluid Nearby / Priority / All switcher for CIRO Alerts.
+/// Fluid Nearby / Priority / All switcher for BaKhabarAlerts.
 class AlertsModeSelector extends StatelessWidget {
   const AlertsModeSelector({
     super.key,

@@ -60,7 +60,7 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                 ),
               )
             : null,
-        title: const Text('CIRO Alerts', style: AppTextStyles.alertsTitle),
+        title: const Text('BaKhabarAlerts', style: AppTextStyles.alertsTitle),
         actions: <Widget>[
           if (controller.activePriorityFilters.isNotEmpty)
             IconButton(

@@ -740,114 +740,6 @@ class CityWiseStackedAreaChart extends StatelessWidget {
 // ======================== 100% STACKED BAR CHART ===========================
 // ============================================================================
 
-class PriorityStackedBarChart extends StatelessWidget {
-  final List<IncidentRecord> incidents;
-
-  const PriorityStackedBarChart({
-    Key? key,
-    required this.incidents,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final chartData = _prepareBarChartData();
-
-    return Container(
-      padding: EdgeInsets.all(AppDimens.space16),
-      decoration: BoxDecoration(
-        color: AppColors.glassPanel,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Priority Distribution by Month (100% Stacked)',
-            style: AppTextStyles.sectionTitle,
-          ),
-          SizedBox(height: AppDimens.space12),
-          SizedBox(
-            height: 280,
-            child: SfCartesianChart(
-              plotAreaBorderColor: Colors.transparent,
-              tooltipBehavior: TooltipBehavior(enable: true),
-              primaryXAxis: CategoryAxis(
-                labelStyle: AppTextStyles.chartAxis,
-                majorGridLines: const MajorGridLines(width: 0),
-                axisLine: const AxisLine(color: AppColors.glassBorder),
-              ),
-              primaryYAxis: NumericAxis(
-                labelStyle: AppTextStyles.chartAxis,
-                majorTickLines: const MajorTickLines(size: 0),
-                axisLine: const AxisLine(color: AppColors.glassBorder),
-                majorGridLines: const MajorGridLines(
-                  color: AppColors.border,
-                  dashArray: <double>[5, 5],
-                ),
-                title: AxisTitle(text: '%', textStyle: AppTextStyles.chartAxis),
-              ),
-              series: <CartesianSeries>[
-                StackedBar100Series<_BarChartData, String>(
-                  dataSource: chartData,
-                  xValueMapper: (_BarChartData data, _) => data.month,
-                  yValueMapper: (_BarChartData data, _) => data.critical,
-                  name: 'Critical',
-                  color: IncidentPriority.critical.color,
-                ),
-                StackedBar100Series<_BarChartData, String>(
-                  dataSource: chartData,
-                  xValueMapper: (_BarChartData data, _) => data.month,
-                  yValueMapper: (_BarChartData data, _) => data.high,
-                  name: 'High',
-                  color: IncidentPriority.high.color,
-                ),
-                StackedBar100Series<_BarChartData, String>(
-                  dataSource: chartData,
-                  xValueMapper: (_BarChartData data, _) => data.month,
-                  yValueMapper: (_BarChartData data, _) => data.medium,
-                  name: 'Medium',
-                  color: IncidentPriority.medium.color,
-                ),
-                StackedBar100Series<_BarChartData, String>(
-                  dataSource: chartData,
-                  xValueMapper: (_BarChartData data, _) => data.month,
-                  yValueMapper: (_BarChartData data, _) => data.low,
-                  name: 'Low',
-                  color: IncidentPriority.low.color,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<_BarChartData> _prepareBarChartData() {
-    final byMonthAndPriority =
-    IncidentDataAggregator.getIncidentsByMonthAndPriority(incidents);
-    final List<_BarChartData> data = [];
-
-    const months = ['January', 'February', 'March', 'April'];
-
-    for (int i = 1; i <= 4; i++) {
-      final priorityData = byMonthAndPriority[i] ?? {};
-      data.add(
-        _BarChartData(
-          month: months[i - 1],
-          critical: (priorityData[IncidentPriority.critical] ?? 0).toDouble(),
-          high: (priorityData[IncidentPriority.high] ?? 0).toDouble(),
-          medium: (priorityData[IncidentPriority.medium] ?? 0).toDouble(),
-          low: (priorityData[IncidentPriority.low] ?? 0).toDouble(),
-        ),
-      );
-    }
-
-    return data;
-  }
-}
-
 // ============================================================================
 // ======================== DOUGHNUT CHART ===================================
 // ============================================================================
@@ -1211,9 +1103,6 @@ class StatusScreen extends StatelessWidget {
 
           // ==== CHARTS ====
           CityWiseStackedAreaChart(incidents: incidents),
-          SizedBox(height: AppDimens.space16),
-
-          PriorityStackedBarChart(incidents: incidents),
           SizedBox(height: AppDimens.space16),
 
           CityDistributionDoughnutChart(incidents: incidents),

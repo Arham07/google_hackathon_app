@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 
-/// CIRO Alerts typography — single scale for the whole app.
+/// BaKhabarAlerts typography — single scale for the whole app.
 ///
 /// Hierarchy (px): screen title 20 → detail title 17 → body 14 → secondary 12.5 → caption 11.
 abstract final class AppTextStyles {

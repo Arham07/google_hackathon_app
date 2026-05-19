@@ -1,4 +1,4 @@
-/// Backend base URL for CIRO Events + user-reports APIs.
+/// Backend base URL for BaKhabarEvents + user-reports APIs.
 abstract final class ApiConfig {
   static const String baseUrl = 'https://ciro-backeend-app.netlify.app';
 

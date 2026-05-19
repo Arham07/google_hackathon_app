@@ -3,6 +3,7 @@ import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
+import 'package:google_hackathon_app/widgets/app_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.onFinished});
@@ -58,6 +59,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (int index) => setState(() => _page = index),
                 children: const [
                   _OnboardingPage(
+                    useLogo: true,
                     icon: Icons.water_drop_outlined,
                     title: 'Pakistan needs you prepared',
                     body:
@@ -119,11 +121,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class _OnboardingPage extends StatelessWidget {
   const _OnboardingPage({
+    this.useLogo = false,
     required this.icon,
     required this.title,
     required this.body,
   });
 
+  final bool useLogo;
   final IconData icon;
   final String title;
   final String body;
@@ -138,7 +142,10 @@ class _OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: AppDimens.iconOnboarding, color: AppColors.mapAccent),
+          if (useLogo)
+            const AppLogo()
+          else
+            Icon(icon, size: AppDimens.iconOnboarding, color: AppColors.mapAccent),
           SizedBox(height: AppDimens.space32),
           Text(
             title,

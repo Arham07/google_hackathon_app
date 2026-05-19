@@ -8,7 +8,7 @@ import 'package:google_hackathon_app/theme/priority_styles.dart';
 import 'package:google_hackathon_app/utils/incident_time_format.dart';
 import 'package:intl/intl.dart';
 
-/// Refactored compact alert incident card for CIRO Alerts list.
+/// Refactored compact alert incident card for BaKhabarAlerts list.
 class IncidentCard extends StatelessWidget {
   const IncidentCard({super.key, required this.incident, required this.onTap, this.onOpenOnMap});
 

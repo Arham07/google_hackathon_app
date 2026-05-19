@@ -15,7 +15,7 @@ abstract final class AppDimens {
   static double get space32 => 32.r;
   static double get space40 => 40.r;
 
-  /// Matches ciro `--radius: 0.625rem` (~10 logical px).
+  /// Matches BaKhabar`--radius: 0.625rem` (~10 logical px).
   static double get radiusSm => 6.r;
   static double get radiusMd => 10.r;
   static double get radiusLg => 12.r;
@@ -29,6 +29,8 @@ abstract final class AppDimens {
   static double get iconXl => 48.sp;
   static double get iconHero => 56.sp;
   static double get iconOnboarding => 72.sp;
+  static double get logoHeight => 88.h;
+  static double get logoHeightCompact => 56.h;
 
   static double get font10 => 10.sp;
   static double get font11 => 11.sp;

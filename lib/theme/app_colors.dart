@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// CIRO dark tactical palette — deep charcoal navy (no pure black).
+/// BaKhabardark tactical palette — deep charcoal navy (no pure black).
 abstract final class AppColors {
   // Surfaces
   static const Color background = Color(0xFF121822);

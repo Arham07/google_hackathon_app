@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/notifications/models/alert_notification.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 
-/// Dummy notifications — content aligned with the CIRO Alerts feed screenshot.
+/// Dummy notifications — content aligned with the BaKhabarAlerts feed screenshot.
 List<AlertNotification> createMockNotifications() {
   return <AlertNotification>[
     AlertNotification(

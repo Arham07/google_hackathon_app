@@ -3,6 +3,7 @@ import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
+import 'package:google_hackathon_app/widgets/app_logo.dart';
 
 /// Account bottom sheet — sign out lives here instead of the app bar.
 Future<void> showAccountMenuSheet(
@@ -36,17 +37,12 @@ Future<void> showAccountMenuSheet(
                 ),
               ),
               SizedBox(height: AppDimens.space20),
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: AppColors.surfaceElevated,
-                child: Icon(
-                  Icons.person_outline,
-                  size: AppDimens.iconXl,
-                  color: AppColors.mapAccent,
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                child: const AppLogo(height: 64),
               ),
               SizedBox(height: AppDimens.space12),
-              Text('CIRO Alerts', style: AppTextStyles.sectionTitle),
+              Text('BaKhabarAlerts', style: AppTextStyles.sectionTitle),
               SizedBox(height: AppDimens.space24),
               SizedBox(
                 width: double.infinity,

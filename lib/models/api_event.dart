@@ -5,7 +5,7 @@ import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident_source.dart';
 import 'package:google_hackathon_app/theme/priority_styles.dart';
 
-/// Typed view of a CIRO event row from `/api/events`.
+/// Typed view of a BaKhabarevent row from `/api/events`.
 class ApiEvent {
   const ApiEvent({
     required this.eventId,

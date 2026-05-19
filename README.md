@@ -1,6 +1,6 @@
 # google_hackathon_app
 
-CIRO Alerts — Flutter client for incident feed, map, and citizen reports.
+BaKhabarAlerts — Flutter client for incident feed, map, and citizen reports.
 
 ## Getting Started
 

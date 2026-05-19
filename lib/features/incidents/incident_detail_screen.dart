@@ -55,7 +55,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     } on ApiException {
       // Keep list-row data.
     } catch (_) {
-      // Ignore — list payload is sufficient for CIRO events API.
+      // Ignore — list payload is sufficient for BaKhabarevents API.
     } finally {
       if (mounted) setState(() => _loadingExtra = false);
     }
