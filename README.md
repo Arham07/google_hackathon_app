@@ -1,6 +1,6 @@
 # google_hackathon_app
 
-BaKhabarAlerts — Flutter client for incident feed, map, and citizen reports.
+BaKhabar Alerts — Flutter client for incident feed, map, and citizen reports.
 
 ## Getting Started
 

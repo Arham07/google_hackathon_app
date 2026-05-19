@@ -58,7 +58,7 @@ class _CiroAppState extends State<CiroApp> {
           key: ValueKey<String>(_gate == _AppGate.home ? 'shell' : 'auth'),
           create: (_) => IncidentsController(),
           child: MaterialApp(
-            title: 'BaKhabarAlerts',
+            title: 'BaKhabar Alerts',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.darkTheme(),
             home: switch (_gate) {

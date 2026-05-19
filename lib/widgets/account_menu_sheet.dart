@@ -42,7 +42,7 @@ Future<void> showAccountMenuSheet(
                 child: const AppLogo(height: 64),
               ),
               SizedBox(height: AppDimens.space12),
-              Text('BaKhabarAlerts', style: AppTextStyles.sectionTitle),
+              Text('BaKhabar Alerts', style: AppTextStyles.sectionTitle),
               SizedBox(height: AppDimens.space24),
               SizedBox(
                 width: double.infinity,

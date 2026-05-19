@@ -18,7 +18,7 @@
         android:required="false"/>
 
     <application
-        android:label="Ba-Khabar"
+        android:label="BaKhabar"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

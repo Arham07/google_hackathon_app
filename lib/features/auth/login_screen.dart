@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Center(child: AppLogo()),
                 SizedBox(height: AppDimens.space16),
                 const Text(
-                  'BaKhabarAlerts',
+                  'BaKhabar Alerts',
                   textAlign: TextAlign.center,
                   style: AppTextStyles.screenTitle,
                 ),
