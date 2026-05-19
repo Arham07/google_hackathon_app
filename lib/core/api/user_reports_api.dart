@@ -41,16 +41,12 @@ class UserReportsApi {
     required String text,
     required double lat,
     required double lng,
-    String? city,
-    String? area,
     String? photoPath,
   }) async {
     final FormData formData = FormData.fromMap(<String, dynamic>{
       'text': text,
       'lat': lat.toString(),
       'lng': lng.toString(),
-      if (city != null && city.isNotEmpty) 'city': city,
-      if (area != null && area.isNotEmpty) 'area': area,
       if (photoPath != null)
         'photo': await MultipartFile.fromFile(
           photoPath,
