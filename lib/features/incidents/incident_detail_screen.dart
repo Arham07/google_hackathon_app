@@ -134,15 +134,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 DateFormat('dd MMM yyyy, HH:mm').format(_incident.scanDatetime),
                 style: DetailTextStyles.metaSmall,
               ),
-              if (_incident.hasMapCoordinates) ...[
-                SizedBox(height: AppDimens.space6),
-                Text(
-                  'Coordinates: ${_incident.mapLatitude.toStringAsFixed(6)}, '
-                  '${_incident.mapLongitude.toStringAsFixed(6)}',
-                  style: DetailTextStyles.accentMeta,
-                ),
-              ],
-              SizedBox(height: AppDimens.space20),
+              SizedBox(height: AppDimens.space16),
               if (_loadingExtra)
                 Padding(
                   padding: EdgeInsets.only(bottom: AppDimens.space12),

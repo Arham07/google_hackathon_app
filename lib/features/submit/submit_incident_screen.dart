@@ -363,7 +363,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
           onPressed: _pickPhoto,
           icon: const Icon(Icons.photo_camera_outlined),
           label:
-              Text(_photo == null ? 'Add photo (optional)' : 'Change photo'),
+              Text(_photo == null ? 'Add photo' : 'Change photo'),
         ),
         if (_photo != null) ...[
           SizedBox(height: AppDimens.space12),
