@@ -276,7 +276,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
           return AlertDialog(
             title: Text(
                 result.isDuplicate ? 'Duplicate report' : 'Report received'),
-            content: Text(message),
+            content: Text('Thank you for your submission.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -479,10 +479,6 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                      Text(
-                                        '${_pickedLocation!.latitude.toStringAsFixed(6)}, ${_pickedLocation!.longitude.toStringAsFixed(6)}',
-                                        style: AppTextStyles.mono,
-                                      ),
                                     ]
                                   : [
                                       const Text(

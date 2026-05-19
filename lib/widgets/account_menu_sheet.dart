@@ -47,11 +47,6 @@ Future<void> showAccountMenuSheet(
               ),
               SizedBox(height: AppDimens.space12),
               Text('CIRO Alerts', style: AppTextStyles.sectionTitle),
-              SizedBox(height: AppDimens.space4),
-              Text(
-                'Signed in — demo session',
-                style: AppTextStyles.bodyMuted,
-              ),
               SizedBox(height: AppDimens.space24),
               SizedBox(
                 width: double.infinity,

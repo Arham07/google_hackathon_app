@@ -35,7 +35,7 @@ class UserReportSubmitResponse {
 /// POST /api/user-reports/submit (multipart).
 class UserReportsApi {
   UserReportsApi({ApiClient? client})
-      : _client = client ?? ApiClient(baseUrl: ApiConfig.userReportsBaseUrl);
+      : _client = client ?? ApiClient(baseUrl: ApiConfig.baseUrl);
 
   final ApiClient _client;
 

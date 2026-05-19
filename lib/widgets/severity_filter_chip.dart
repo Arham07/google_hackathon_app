@@ -23,7 +23,7 @@ class SeverityFilterChip extends StatelessWidget {
         style: TextStyle(
           color: priority.color,
           fontWeight: FontWeight.w700,
-          fontSize: AppDimens.font11,
+          fontSize: AppDimens.font10,
           letterSpacing: 0.4,
         ),
       ),

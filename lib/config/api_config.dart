@@ -2,9 +2,6 @@
 abstract final class ApiConfig {
   static const String baseUrl = 'https://ciro-backeend-app.netlify.app';
 
-  /// Local user-reports API (Android emulator → host `localhost:3000`).
-  static const String userReportsBaseUrl = 'http://10.0.2.2:3000';
-
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
