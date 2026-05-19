@@ -159,7 +159,8 @@ class IncidentsController extends ChangeNotifier {
   Future<EventsListResponse> _fetchForMode() async {
     switch (mode) {
       case IncidentListMode.nearby:
-        final LatLng? position = await LocationService.getCurrentLatLng();
+        final LocationAccess access = await LocationService.getCurrentLocation();
+        final LatLng? position = access.position;
         final double lat = position?.latitude ?? _karachiFallback.latitude;
         final double lng = position?.longitude ?? _karachiFallback.longitude;
         return _eventsApi.fetchNearest(lat: lat, lng: lng);

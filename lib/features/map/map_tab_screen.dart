@@ -25,13 +25,15 @@ class MapTabScreen extends StatefulWidget {
 class _MapTabScreenState extends State<MapTabScreen> {
   final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
 
-  static const CameraPosition _kKarachi = CameraPosition(target: LatLng(24.8607, 67.0011), zoom: 11.5);
+  static final CameraPosition _fallbackCamera = CameraPosition(
+    target: LocationService.fallbackCenter,
+    zoom: 11.5,
+  );
 
   CameraPosition? _initialCamera;
   BitmapDescriptor? _alertIcon;
   Set<Marker> _incidentMarkers = {};
   Marker? _searchMarker;
-  LatLng? _currentPosition;
   bool _locationReady = false;
   bool _mapReady = false;
   Incident? _selectedMapIncident;
@@ -78,27 +80,23 @@ class _MapTabScreenState extends State<MapTabScreen> {
     final IncidentsController incidents = context.read<IncidentsController>();
 
     final List<dynamic> results = await Future.wait<dynamic>(<Future<dynamic>>[
-      LocationService.getCurrentLatLng(),
       createFloodAlertMarkerIcon(),
       incidents.loadMapEvents(),
     ]);
 
     if (!mounted) return;
 
-    final LatLng? position = results[0] as LatLng?;
-    final BitmapDescriptor icon = results[1] as BitmapDescriptor;
+    final LatLng? position =
+        await LocationService.obtainCurrentLocation(context);
+    if (!mounted) return;
 
-    final LatLng cameraTarget = position ?? _kKarachi.target;
+    final BitmapDescriptor icon = results[0] as BitmapDescriptor;
+
+    final LatLng cameraTarget = position ?? _fallbackCamera.target;
     if (position != null) {
-      _currentPosition = position;
       _locationReady = true;
     } else {
       _locationReady = false;
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Location unavailable — showing Karachi. Enable GPS for your position.')));
-      }
     }
 
     if (incidents.mapEventsError != null && mounted) {
@@ -183,15 +181,10 @@ class _MapTabScreenState extends State<MapTabScreen> {
   }
 
   Future<void> _goToMyLocation() async {
-    final LatLng? position = _currentPosition ?? await LocationService.getCurrentLatLng();
-    if (position == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not get your location.')));
-      return;
-    }
+    final LatLng? position = await LocationService.obtainCurrentLocation(context);
+    if (position == null) return;
     setState(() {
       _selectedMapIncident = null;
-      _currentPosition = position;
       _locationReady = true;
     });
     if (!_mapController.isCompleted) return;

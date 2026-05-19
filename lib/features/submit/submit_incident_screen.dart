@@ -24,8 +24,10 @@ class SubmitIncidentScreen extends StatefulWidget {
 }
 
 class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
-  static const CameraPosition _kKarachi =
-      CameraPosition(target: LatLng(24.8607, 67.0011), zoom: 13);
+  static final CameraPosition _fallbackCamera = CameraPosition(
+    target: LocationService.fallbackCenter,
+    zoom: 13,
+  );
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Completer<GoogleMapController> _mapController =
@@ -60,7 +62,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   }
 
   Future<void> _bootstrapLocation() async {
-    final LatLng? position = await LocationService.getCurrentLatLng();
+    final LatLng? position =
+        await LocationService.obtainCurrentLocation(context);
     if (!mounted) return;
 
     setState(() {
@@ -76,6 +79,14 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
 
     if (position != null) {
       await _moveMapTo(position.latitude, position.longitude);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Location not set — enable GPS or tap the map to pick a point.',
+          ),
+        ),
+      );
     }
   }
 
@@ -102,7 +113,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
         zoom: 15,
       );
     }
-    return _kKarachi;
+    return _fallbackCamera;
   }
 
   Set<Marker> get _mapMarkers {

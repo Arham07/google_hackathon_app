@@ -46,8 +46,10 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
-  static const CameraPosition _kKarachi =
-      CameraPosition(target: LatLng(24.8607, 67.0011), zoom: 13);
+  static final CameraPosition _fallbackCamera = CameraPosition(
+    target: LocationService.fallbackCenter,
+    zoom: 13,
+  );
 
   CameraPosition? _initialCamera;
   LatLng? _selectedLatLng;
@@ -90,15 +92,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         _loadingLocation = false;
       });
       // Still try to enable my-location blue dot.
-      final LatLng? pos = await LocationService.getCurrentLatLng();
+      final LatLng? pos =
+          await LocationService.obtainCurrentLocation(context);
       if (mounted && pos != null) {
         setState(() => _myLocationEnabled = true);
       }
       return;
     }
 
-    // Otherwise, try to get current location.
-    final LatLng? position = await LocationService.getCurrentLatLng();
+    // Otherwise, centre on the user's current GPS position.
+    final LatLng? position =
+        await LocationService.obtainCurrentLocation(context);
     if (!mounted) return;
 
     if (position != null) {
@@ -110,18 +114,10 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       });
     } else {
       setState(() {
-        _initialCamera = _kKarachi;
+        _initialCamera = _fallbackCamera;
         _myLocationEnabled = false;
         _loadingLocation = false;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Location unavailable — showing Karachi. Enable GPS for your position.'),
-          ),
-        );
-      }
     }
   }
 
@@ -135,14 +131,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   Future<void> _goToMyLocation() async {
-    final LatLng? position = await LocationService.getCurrentLatLng();
-    if (position == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not get your location.')),
-      );
-      return;
-    }
+    final LatLng? position =
+        await LocationService.obtainCurrentLocation(context);
+    if (position == null) return;
 
     setState(() {
       _selectedLatLng = position;
