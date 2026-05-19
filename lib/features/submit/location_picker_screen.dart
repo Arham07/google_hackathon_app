@@ -8,6 +8,7 @@ import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_hackathon_app/services/places_search_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_map_style.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -306,7 +307,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             myLocationEnabled: _myLocationEnabled,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
-            style: _darkMapStyle,
+            style: AppMapStyle.dark,
             onTap: _onMapTap,
             onMapCreated: (GoogleMapController controller) {
               if (!_mapController.isCompleted) {
@@ -525,39 +526,4 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     );
   }
 
-  static const String _darkMapStyle = '''
-  [
-    {
-      "elementType": "geometry",
-      "stylers": [{ "color": "#212121" }]
-    },
-    {
-      "elementType": "labels.icon",
-      "stylers": [{ "visibility": "off" }]
-    },
-    {
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#757575" }]
-    },
-    {
-      "elementType": "labels.text.stroke",
-      "stylers": [{ "color": "#212121" }]
-    },
-    {
-      "featureType": "road",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#383838" }]
-    },
-    {
-      "featureType": "road",
-      "elementType": "geometry.stroke",
-      "stylers": [{ "color": "#1f1f1f" }]
-    },
-    {
-      "featureType": "water",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#000000" }]
-    }
-  ]
-  ''';
 }

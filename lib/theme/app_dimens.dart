@@ -36,5 +36,6 @@ abstract final class AppDimens {
   static double get chipRowHeight => 40.h;
   static double get searchListMaxHeight => 220.h;
   static double get photoPreviewHeight => 160.h;
+  static double get mapPreviewHeight => 180.h;
   static double get newsThumbHeight => 120.h;
 }

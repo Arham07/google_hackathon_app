@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:google_hackathon_app/config/api_config.dart';
 import 'package:google_hackathon_app/core/api/api_client.dart';
 import 'package:google_hackathon_app/core/api/api_endpoints.dart';
 
@@ -33,7 +34,8 @@ class UserReportSubmitResponse {
 
 /// POST /api/user-reports/submit (multipart).
 class UserReportsApi {
-  UserReportsApi({ApiClient? client}) : _client = client ?? ApiClient();
+  UserReportsApi({ApiClient? client})
+      : _client = client ?? ApiClient(baseUrl: ApiConfig.userReportsBaseUrl);
 
   final ApiClient _client;
 
@@ -41,17 +43,16 @@ class UserReportsApi {
     required String text,
     required double lat,
     required double lng,
-    String? photoPath,
+    required String photoPath,
   }) async {
     final FormData formData = FormData.fromMap(<String, dynamic>{
       'text': text,
       'lat': lat.toString(),
       'lng': lng.toString(),
-      if (photoPath != null)
-        'photo': await MultipartFile.fromFile(
-          photoPath,
-          filename: photoPath.split(RegExp(r'[/\\]')).last,
-        ),
+      'photo': await MultipartFile.fromFile(
+        photoPath,
+        filename: photoPath.split(RegExp(r'[/\\]')).last,
+      ),
     });
 
     final Map<String, dynamic> body = await _client.postMultipart(

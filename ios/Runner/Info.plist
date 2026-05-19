@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CIRO needs your location to pin incident reports on the map.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>CIRO needs camera access to attach photos to your incident report.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CIRO needs photo library access to attach images to your incident report.</string>
 </dict>
 </plist>

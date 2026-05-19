@@ -1,13 +1,19 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_hackathon_app/core/api/api_exception.dart';
 import 'package:google_hackathon_app/core/api/user_reports_api.dart';
 import 'package:google_hackathon_app/features/submit/location_picker_screen.dart';
+import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
+import 'package:google_hackathon_app/theme/app_map_style.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SubmitIncidentScreen extends StatefulWidget {
@@ -18,21 +24,96 @@ class SubmitIncidentScreen extends StatefulWidget {
 }
 
 class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
+  static const CameraPosition _kKarachi =
+      CameraPosition(target: LatLng(24.8607, 67.0011), zoom: 13);
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
   final TextEditingController _textController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final UserReportsApi _reportsApi = UserReportsApi();
 
   XFile? _photo;
   bool _submitting = false;
+  bool _locationLoading = true;
+  bool _myLocationEnabled = false;
 
-  /// Selected location from the map picker.
   PickedLocation? _pickedLocation;
 
   @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_onFormChanged);
+    _bootstrapLocation();
+  }
+
+  @override
   void dispose() {
+    _textController.removeListener(_onFormChanged);
     _textController.dispose();
     super.dispose();
+  }
+
+  void _onFormChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _bootstrapLocation() async {
+    final LatLng? position = await LocationService.getCurrentLatLng();
+    if (!mounted) return;
+
+    setState(() {
+      _myLocationEnabled = position != null;
+      if (position != null) {
+        _pickedLocation = PickedLocation(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+      }
+      _locationLoading = false;
+    });
+
+    if (position != null) {
+      await _moveMapTo(position.latitude, position.longitude);
+    }
+  }
+
+  Future<void> _moveMapTo(double lat, double lng) async {
+    if (!_mapController.isCompleted) return;
+    final GoogleMapController controller = await _mapController.future;
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(lat, lng), zoom: 15),
+      ),
+    );
+  }
+
+  bool get _canSubmit {
+    if (_pickedLocation == null || _photo == null || _submitting) return false;
+    final String text = _textController.text.trim();
+    return text.length >= 10;
+  }
+
+  CameraPosition get _mapCamera {
+    if (_pickedLocation != null) {
+      return CameraPosition(
+        target: LatLng(_pickedLocation!.latitude, _pickedLocation!.longitude),
+        zoom: 15,
+      );
+    }
+    return _kKarachi;
+  }
+
+  Set<Marker> get _mapMarkers {
+    if (_pickedLocation == null) return {};
+    return {
+      Marker(
+        markerId: const MarkerId('incident'),
+        position: LatLng(_pickedLocation!.latitude, _pickedLocation!.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    };
   }
 
   // ── Photo picking (gallery or camera) ─────────────────────────────────
@@ -121,7 +202,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   // ── Location picker ───────────────────────────────────────────────────
 
   Future<void> _openLocationPicker() async {
-    final PickedLocation? result = await Navigator.of(context).push<PickedLocation>(
+    final PickedLocation? result =
+        await Navigator.of(context).push<PickedLocation>(
       MaterialPageRoute<PickedLocation>(
         builder: (_) => LocationPickerScreen(
           initialLocation: _pickedLocation,
@@ -131,6 +213,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
 
     if (result != null) {
       setState(() => _pickedLocation = result);
+      await _moveMapTo(result.latitude, result.longitude);
     }
   }
 
@@ -142,7 +225,16 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
     if (_pickedLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select a location on the map first.'),
+          content: Text('Please select a location on the map.'),
+        ),
+      );
+      return;
+    }
+
+    if (_photo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please add a photo of the incident.'),
         ),
       );
       return;
@@ -155,7 +247,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
         text: _textController.text.trim(),
         lat: _pickedLocation!.latitude,
         lng: _pickedLocation!.longitude,
-        photoPath: _photo?.path,
+        photoPath: _photo!.path,
       );
 
       if (!mounted) return;
@@ -180,10 +272,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   Navigator.of(context).pop();
                   if (!result.isDuplicate) {
                     _textController.clear();
-                    setState(() {
-                      _photo = null;
-                      _pickedLocation = null;
-                    });
+                    setState(() => _photo = null);
+                    _bootstrapLocation();
                   }
                 },
                 child: const Text('OK'),
@@ -221,11 +311,9 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Location selector ──
-              _buildLocationCard(),
+              _buildLocationSection(),
               SizedBox(height: AppDimens.space20),
 
-              // ── Description ──
               TextFormField(
                 controller: _textController,
                 maxLines: 5,
@@ -237,7 +325,10 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   alignLabelWithHint: true,
                 ),
                 validator: (String? value) {
-                  if (value == null || value.trim().length < 10) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Description is required';
+                  }
+                  if (value.trim().length < 10) {
                     return 'Please provide at least 10 characters';
                   }
                   return null;
@@ -245,13 +336,11 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
               ),
               SizedBox(height: AppDimens.space20),
 
-              // ── Photo ──
               _buildPhotoSection(),
               SizedBox(height: AppDimens.space28),
 
-              // ── Submit button ──
               ElevatedButton(
-                onPressed: _submitting ? null : _submit,
+                onPressed: _canSubmit ? _submit : null,
                 child: _submitting
                     ? SizedBox(
                         height: 22.w,
@@ -268,133 +357,206 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
     );
   }
 
-  Widget _buildLocationCard() {
+  Widget _buildLocationSection() {
     final bool hasLocation = _pickedLocation != null;
 
-    return GestureDetector(
-      onTap: _openLocationPicker,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: EdgeInsets.all(AppDimens.space14),
-        decoration: BoxDecoration(
-          color: hasLocation
-              ? AppColors.mapAccent.withValues(alpha: 0.08)
-              : AppColors.glassPanel,
-          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          border: Border.all(
-            color: hasLocation
-                ? AppColors.mapAccent.withValues(alpha: 0.4)
-                : AppColors.glassBorder,
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Location *',
+          style: AppTextStyles.sectionTitle,
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(AppDimens.space10),
+        SizedBox(height: AppDimens.space8),
+        GestureDetector(
+          onTap: _openLocationPicker,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            child: Container(
+              height: AppDimens.mapPreviewHeight,
               decoration: BoxDecoration(
-                color: hasLocation
-                    ? AppColors.mapAccent.withValues(alpha: 0.15)
-                    : AppColors.surfaceElevated,
+                border: Border.all(
+                  color: hasLocation
+                      ? AppColors.mapAccent.withValues(alpha: 0.4)
+                      : AppColors.glassBorder,
+                ),
                 borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               ),
-              child: Icon(
-                hasLocation ? Icons.pin_drop : Icons.add_location_alt_outlined,
-                color: hasLocation
-                    ? AppColors.mapAccent
-                    : AppColors.textSecondary,
-                size: 22,
-              ),
-            ),
-            SizedBox(width: AppDimens.space12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: hasLocation
-                    ? [
-                        if (_pickedLocation!.address != null)
-                          Text(
-                            _pickedLocation!.address!,
-                            style: AppTextStyles.bodySecondary,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        Text(
-                          '${_pickedLocation!.latitude.toStringAsFixed(6)}, ${_pickedLocation!.longitude.toStringAsFixed(6)}',
-                          style: AppTextStyles.mono,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: _mapCamera,
+                    markers: _mapMarkers,
+                    myLocationEnabled: _myLocationEnabled,
+                    myLocationButtonEnabled: false,
+                    zoomControlsEnabled: false,
+                    scrollGesturesEnabled: false,
+                    zoomGesturesEnabled: false,
+                    tiltGesturesEnabled: false,
+                    rotateGesturesEnabled: false,
+                    style: AppMapStyle.dark,
+                    gestureRecognizers:
+                        <Factory<OneSequenceGestureRecognizer>>{
+                      Factory<OneSequenceGestureRecognizer>(
+                        () => EagerGestureRecognizer(),
+                      ),
+                    },
+                    onMapCreated: (GoogleMapController controller) {
+                      if (!_mapController.isCompleted) {
+                        _mapController.complete(controller);
+                      }
+                      if (_pickedLocation != null) {
+                        controller.moveCamera(
+                          CameraUpdate.newCameraPosition(_mapCamera),
+                        );
+                      }
+                    },
+                  ),
+                  if (_locationLoading)
+                    ColoredBox(
+                      color: AppColors.surfaceElevated,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(),
+                            SizedBox(height: AppDimens.space12),
+                            Text(
+                              'Getting your location…',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
                         ),
-                        SizedBox(height: AppDimens.space4),
-                        Text(
-                          'Tap to change',
-                          style: AppTextStyles.caption.copyWith(
+                      ),
+                    ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimens.space12,
+                        vertical: AppDimens.space10,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            AppColors.background.withValues(alpha: 0.85),
+                          ],
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.pin_drop,
+                              color: AppColors.mapAccent, size: 18),
+                          SizedBox(width: AppDimens.space8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: hasLocation
+                                  ? [
+                                      if (_pickedLocation!.address != null)
+                                        Text(
+                                          _pickedLocation!.address!,
+                                          style: AppTextStyles.bodySecondary,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      Text(
+                                        '${_pickedLocation!.latitude.toStringAsFixed(6)}, ${_pickedLocation!.longitude.toStringAsFixed(6)}',
+                                        style: AppTextStyles.mono,
+                                      ),
+                                    ]
+                                  : [
+                                      const Text(
+                                        'Tap to pick location on map',
+                                        style: AppTextStyles.caption,
+                                      ),
+                                    ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.edit_location_alt_outlined,
                             color: AppColors.mapAccent,
+                            size: 20.sp,
                           ),
-                        ),
-                      ]
-                    : [
-                        const Text(
-                          'Select location *',
-                          style: AppTextStyles.body,
-                        ),
-                        SizedBox(height: AppDimens.space4),
-                        Text(
-                          'Tap to open map and pick the incident location',
-                          style: AppTextStyles.caption,
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: hasLocation
-                  ? AppColors.mapAccent
-                  : AppColors.textSecondary,
-            ),
-          ],
+          ),
         ),
-      ),
+        if (hasLocation && !_locationLoading) ...[
+          SizedBox(height: AppDimens.space6),
+          Text(
+            _myLocationEnabled
+                ? 'Blue dot is your current position. Tap the map to adjust.'
+                : 'Tap the map to change this location',
+            style: AppTextStyles.caption,
+          ),
+        ] else if (!hasLocation && !_locationLoading) ...[
+          SizedBox(height: AppDimens.space6),
+          Text(
+            'Location is required — enable GPS or tap the map to pick a point',
+            style: AppTextStyles.caption.copyWith(color: AppColors.chart1),
+          ),
+        ],
+      ],
     );
   }
 
   Widget _buildPhotoSection() {
+    final bool hasPhoto = _photo != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Row(
+          children: [
+            const Text(
+              'Photo *',
+              style: AppTextStyles.sectionTitle,
+            ),
+            if (!hasPhoto) ...[
+              const Spacer(),
+              Text(
+                'Required',
+                style: AppTextStyles.caption.copyWith(color: AppColors.chart1),
+              ),
+            ],
+          ],
+        ),
+        SizedBox(height: AppDimens.space8),
         OutlinedButton.icon(
           onPressed: _pickPhoto,
           icon: const Icon(Icons.photo_camera_outlined),
-          label:
-              Text(_photo == null ? 'Add photo (optional)' : 'Change photo'),
+          label: Text(hasPhoto ? 'Change photo' : 'Add photo'),
         ),
-        if (_photo != null) ...[
+        if (hasPhoto) ...[
           SizedBox(height: AppDimens.space12),
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                child: Image.file(
-                  File(_photo!.path),
-                  height: AppDimens.photoPreviewHeight,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: AppDimens.space6,
-                right: AppDimens.space6,
-                child: GestureDetector(
-                  onTap: () => setState(() => _photo = null),
-                  child: Container(
-                    padding: EdgeInsets.all(AppDimens.space4),
-                    decoration: BoxDecoration(
-                      color: AppColors.background.withValues(alpha: 0.7),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.close,
-                        color: AppColors.textPrimary, size: 18),
-                  ),
-                ),
-              ),
-            ],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            child: Image.file(
+              File(_photo!.path),
+              height: AppDimens.photoPreviewHeight,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ] else ...[
+          SizedBox(height: AppDimens.space6),
+          Text(
+            'A photo is required before you can submit',
+            style: AppTextStyles.caption.copyWith(color: AppColors.chart1),
           ),
         ],
       ],
