@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_hackathon_app/core/auth_service.dart';
 import 'package:google_hackathon_app/features/incidents/incident_detail_screen.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
+import 'package:google_hackathon_app/features/notifications/notification_routes.dart';
+import 'package:google_hackathon_app/features/notifications/notifications_screen.dart';
+import 'package:google_hackathon_app/features/notifications/notifications_store.dart';
 import 'package:google_hackathon_app/theme/app_colors.dart';
 import 'package:google_hackathon_app/theme/app_dimens.dart';
 import 'package:google_hackathon_app/theme/app_text_styles.dart';
+import 'package:google_hackathon_app/widgets/account_menu_sheet.dart';
 import 'package:google_hackathon_app/widgets/alerts_mode_selector.dart';
 import 'package:google_hackathon_app/widgets/incident_card.dart';
 import 'package:google_hackathon_app/widgets/severity_filter_chip.dart';
@@ -39,6 +42,24 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        leading: widget.onLogout != null
+            ? IconButton(
+                tooltip: 'Account',
+                onPressed: () => showAccountMenuSheet(
+                  context,
+                  onLogout: widget.onLogout!,
+                ),
+                icon: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: AppColors.surfaceElevated,
+                  child: Icon(
+                    Icons.person_outline,
+                    size: AppDimens.iconMd,
+                    color: AppColors.mapAccent,
+                  ),
+                ),
+              )
+            : null,
         title: const Text('CIRO Alerts', style: AppTextStyles.alertsTitle),
         actions: <Widget>[
           if (controller.activePriorityFilters.isNotEmpty)
@@ -47,14 +68,12 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
               tooltip: 'Clear priority filters',
               onPressed: controller.clearPriorityFilters,
             ),
-          if (widget.onLogout != null)
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await AuthService().logout();
-                widget.onLogout!();
-              },
-            ),
+          _NotificationsAppBarAction(
+            unreadCount: NotificationsStore.instance.unreadCount,
+            onReturn: () {
+              if (mounted) setState(() {});
+            },
+          ),
         ],
       ),
       body: Column(
@@ -172,6 +191,35 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                 : () => widget.onOpenIncidentOnMap!(incident),
           );
         },
+      ),
+    );
+  }
+}
+
+class _NotificationsAppBarAction extends StatelessWidget {
+  const _NotificationsAppBarAction({
+    required this.unreadCount,
+    required this.onReturn,
+  });
+
+  final int unreadCount;
+  final VoidCallback onReturn;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Notifications',
+      onPressed: () async {
+        await Navigator.of(context).push<void>(
+          notificationFadeSlideRoute<void>(const NotificationsScreen()),
+        );
+        onReturn();
+      },
+      icon: Badge(
+        isLabelVisible: unreadCount > 0,
+        label: Text('$unreadCount'),
+        backgroundColor: AppColors.destructive,
+        child: const Icon(Icons.notifications_outlined),
       ),
     );
   }
