@@ -86,8 +86,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
 
     if (!mounted) return;
 
-    final LatLng? position =
-        await LocationService.obtainCurrentLocation(context);
+    final LatLng? position = await LocationService.getCurrentLatLng();
     if (!mounted) return;
 
     final BitmapDescriptor icon = results[0] as BitmapDescriptor;
@@ -181,7 +180,7 @@ class _MapTabScreenState extends State<MapTabScreen> {
   }
 
   Future<void> _goToMyLocation() async {
-    final LatLng? position = await LocationService.obtainCurrentLocation(context);
+    final LatLng? position = await LocationService.getCurrentLatLng();
     if (position == null) return;
     setState(() {
       _selectedMapIncident = null;

@@ -62,8 +62,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   }
 
   Future<void> _bootstrapLocation() async {
-    final LatLng? position =
-        await LocationService.obtainCurrentLocation(context);
+    final LatLng? position = await LocationService.getCurrentLatLng();
     if (!mounted) return;
 
     setState(() {

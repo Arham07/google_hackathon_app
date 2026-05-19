@@ -92,8 +92,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         _loadingLocation = false;
       });
       // Still try to enable my-location blue dot.
-      final LatLng? pos =
-          await LocationService.obtainCurrentLocation(context);
+      final LatLng? pos = await LocationService.getCurrentLatLng();
       if (mounted && pos != null) {
         setState(() => _myLocationEnabled = true);
       }
@@ -101,8 +100,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     }
 
     // Otherwise, centre on the user's current GPS position.
-    final LatLng? position =
-        await LocationService.obtainCurrentLocation(context);
+    final LatLng? position = await LocationService.getCurrentLatLng();
     if (!mounted) return;
 
     if (position != null) {
@@ -131,8 +129,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   Future<void> _goToMyLocation() async {
-    final LatLng? position =
-        await LocationService.obtainCurrentLocation(context);
+    final LatLng? position = await LocationService.getCurrentLatLng();
     if (position == null) return;
 
     setState(() {
