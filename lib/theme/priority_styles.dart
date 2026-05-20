@@ -68,17 +68,22 @@ extension IncidentPriorityX on IncidentPriority {
   Color get backgroundColor => color.withValues(alpha: 0.12);
 
   static IncidentPriority fromString(String? value) {
-    switch (value?.toUpperCase()) {
-      case 'CRITICAL':
-        return IncidentPriority.critical;
-      case 'HIGH':
-        return IncidentPriority.high;
-      case 'MEDIUM':
-        return IncidentPriority.medium;
-      case 'LOW':
-        return IncidentPriority.low;
-      default:
-        return IncidentPriority.unknown;
+    if (value == null || value.trim().isEmpty) {
+      return IncidentPriority.unknown;
     }
+    final String v = value.trim().toUpperCase();
+    if (v == 'CRITICAL' || v.contains('CRIT')) {
+      return IncidentPriority.critical;
+    }
+    if (v == 'HIGH' || v.startsWith('HIGH')) {
+      return IncidentPriority.high;
+    }
+    if (v == 'MEDIUM' || v.startsWith('MED')) {
+      return IncidentPriority.medium;
+    }
+    if (v == 'LOW' || v.startsWith('LOW')) {
+      return IncidentPriority.low;
+    }
+    return IncidentPriority.unknown;
   }
 }

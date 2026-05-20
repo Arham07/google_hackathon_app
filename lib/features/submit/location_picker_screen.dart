@@ -51,10 +51,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     zoom: 13,
   );
 
-  CameraPosition? _initialCamera;
+  late final CameraPosition _initialCamera;
   LatLng? _selectedLatLng;
   String? _selectedAddress;
-  bool _loadingLocation = true;
   bool _myLocationEnabled = false;
 
   // Search state
@@ -67,6 +66,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   @override
   void initState() {
     super.initState();
+    final PickedLocation? initial = widget.initialLocation;
+    if (initial != null) {
+      _selectedLatLng = LatLng(initial.latitude, initial.longitude);
+      _selectedAddress = initial.address;
+      _initialCamera = CameraPosition(
+        target: LatLng(initial.latitude, initial.longitude),
+        zoom: 15,
+      );
+    } else {
+      _initialCamera = _fallbackCamera;
+    }
     _bootstrap();
   }
 
@@ -79,43 +89,22 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   Future<void> _bootstrap() async {
-    // If we already have a location, use it as initial position.
-    if (widget.initialLocation != null) {
-      final PickedLocation loc = widget.initialLocation!;
-      setState(() {
-        _selectedLatLng = LatLng(loc.latitude, loc.longitude);
-        _selectedAddress = loc.address;
-        _initialCamera = CameraPosition(
-          target: LatLng(loc.latitude, loc.longitude),
-          zoom: 15,
-        );
-        _loadingLocation = false;
-      });
-      // Still try to enable my-location blue dot.
-      final LatLng? pos = await LocationService.getCurrentLatLng();
-      if (mounted && pos != null) {
-        setState(() => _myLocationEnabled = true);
-      }
-      return;
-    }
-
-    // Otherwise, centre on the user's current GPS position.
     final LatLng? position = await LocationService.getCurrentLatLng();
     if (!mounted) return;
 
-    if (position != null) {
-      setState(() {
-        _selectedLatLng = position;
-        _initialCamera = CameraPosition(target: position, zoom: 15);
-        _myLocationEnabled = true;
-        _loadingLocation = false;
-      });
-    } else {
-      setState(() {
-        _initialCamera = _fallbackCamera;
-        _myLocationEnabled = false;
-        _loadingLocation = false;
-      });
+    setState(() => _myLocationEnabled = position != null);
+
+    if (position == null || _selectedLatLng != null) return;
+
+    setState(() => _selectedLatLng = position);
+
+    if (_mapController.isCompleted) {
+      final GoogleMapController controller = await _mapController.future;
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: position, zoom: 15),
+        ),
+      );
     }
   }
 
@@ -277,20 +266,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loadingLocation || _initialCamera == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Pick location')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       body: Stack(
         children: [
           // ── Map ──
           GoogleMap(
             mapType: MapType.normal,
-            initialCameraPosition: _initialCamera!,
+            initialCameraPosition: _initialCamera,
             markers: _markers,
             myLocationEnabled: _myLocationEnabled,
             myLocationButtonEnabled: false,

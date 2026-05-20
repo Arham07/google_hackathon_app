@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_hackathon_app/features/incidents/incident_detail_screen.dart';
+import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_hackathon_app/features/incidents/incidents_controller.dart';
 import 'package:google_hackathon_app/features/incidents/models/incident.dart';
 import 'package:google_hackathon_app/features/notifications/notification_routes.dart';
@@ -124,6 +125,13 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
       return const Center(child: CircularProgressIndicator(color: AppColors.mapAccent));
     }
 
+    if (controller.isNearbyLocationBlocked) {
+      return _NearbyLocationPrompt(
+        message: controller.errorMessage ?? 'Enable location to see nearby alerts.',
+        onRetry: controller.load,
+      );
+    }
+
     if (controller.errorMessage != null && controller.visibleIncidents.isEmpty) {
       return Center(
         child: Padding(
@@ -158,11 +166,17 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
 
     if (incidents.isEmpty) {
       return Center(
-        child: Text(
-          controller.activePriorityFilters.isNotEmpty
-              ? 'No incidents match selected priorities'
-              : 'No incidents found',
-          style: AppTextStyles.emptyState,
+        child: Padding(
+          padding: EdgeInsets.all(AppDimens.space24),
+          child: Text(
+            controller.activePriorityFilters.isNotEmpty
+                ? 'No incidents match selected priorities'
+                : controller.mode == IncidentListMode.priority
+                    ? 'No critical, high, or medium priority incidents'
+                    : 'No incidents found',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.emptyState,
+          ),
         ),
       );
     }
@@ -191,6 +205,60 @@ class _IncidentsListScreenState extends State<IncidentsListScreen> {
                 : () => widget.onOpenIncidentOnMap!(incident),
           );
         },
+      ),
+    );
+  }
+}
+
+class _NearbyLocationPrompt extends StatelessWidget {
+  const _NearbyLocationPrompt({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(AppDimens.space24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              Icons.location_off_outlined,
+              size: AppDimens.iconXl,
+              color: AppColors.textSecondary,
+            ),
+            SizedBox(height: AppDimens.space16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.emptyState,
+            ),
+            SizedBox(height: AppDimens.space20),
+            FilledButton.icon(
+              onPressed: () async {
+                final bool opened = await LocationService.openAppSettings();
+                if (!opened) {
+                  await LocationService.openLocationSettings();
+                }
+              },
+              icon: const Icon(Icons.settings_outlined),
+              label: const Text('Enable location'),
+            ),
+            SizedBox(height: AppDimens.space10),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await onRetry();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again'),
+            ),
+          ],
+        ),
       ),
     );
   }

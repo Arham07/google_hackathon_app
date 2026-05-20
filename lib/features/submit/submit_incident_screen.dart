@@ -38,7 +38,6 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
 
   XFile? _photo;
   bool _submitting = false;
-  bool _locationLoading = true;
   bool _myLocationEnabled = false;
 
   PickedLocation? _pickedLocation;
@@ -65,20 +64,21 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
     final LatLng? position = await LocationService.getCurrentLatLng();
     if (!mounted) return;
 
+    final bool hadLocation = _pickedLocation != null;
+
     setState(() {
       _myLocationEnabled = position != null;
-      if (position != null) {
+      if (position != null && _pickedLocation == null) {
         _pickedLocation = PickedLocation(
           latitude: position.latitude,
           longitude: position.longitude,
         );
       }
-      _locationLoading = false;
     });
 
-    if (position != null) {
+    if (position != null && !hadLocation) {
       await _moveMapTo(position.latitude, position.longitude);
-    } else if (mounted) {
+    } else if (position == null && _pickedLocation == null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -223,7 +223,9 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
 
     if (result != null) {
       setState(() => _pickedLocation = result);
-      await _moveMapTo(result.latitude, result.longitude);
+      if (_mapController.isCompleted) {
+        await _moveMapTo(result.latitude, result.longitude);
+      }
     }
   }
 
@@ -424,23 +426,6 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                       }
                     },
                   ),
-                  if (_locationLoading)
-                    ColoredBox(
-                      color: AppColors.surfaceElevated,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const CircularProgressIndicator(),
-                            SizedBox(height: AppDimens.space12),
-                            Text(
-                              'Getting your location…',
-                              style: AppTextStyles.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   Positioned(
                     left: 0,
                     right: 0,
@@ -501,7 +486,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             ),
           ),
         ),
-        if (hasLocation && !_locationLoading) ...[
+        if (hasLocation) ...[
           SizedBox(height: AppDimens.space6),
           Text(
             _myLocationEnabled
@@ -509,7 +494,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                 : 'Tap the map to change this location',
             style: AppTextStyles.caption,
           ),
-        ] else if (!hasLocation && !_locationLoading) ...[
+        ] else ...[
           SizedBox(height: AppDimens.space6),
           Text(
             'Location is required — enable GPS or tap the map to pick a point',

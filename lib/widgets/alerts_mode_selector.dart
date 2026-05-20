@@ -17,9 +17,9 @@ class AlertsModeSelector extends StatelessWidget {
 
   static const List<({IncidentListMode value, String label, IconData icon})> _options =
       <({IncidentListMode value, String label, IconData icon})>[
+    (value: IncidentListMode.all, label: 'All', icon: Icons.list),
     (value: IncidentListMode.nearby, label: 'Nearby', icon: Icons.near_me_outlined),
     (value: IncidentListMode.priority, label: 'Priority', icon: Icons.priority_high),
-    (value: IncidentListMode.all, label: 'All', icon: Icons.list),
   ];
 
   @override

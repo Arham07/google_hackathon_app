@@ -6,7 +6,16 @@ import 'package:google_hackathon_app/models/api_event.dart';
 import 'package:google_hackathon_app/services/location_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-enum IncidentListMode { nearby, priority, all }
+enum IncidentListMode { all, nearby, priority }
+
+/// Thrown when Nearby mode cannot load without a GPS fix.
+class NearbyLocationRequired implements Exception {
+  const NearbyLocationRequired(this.status);
+
+  final LocationAccessStatus status;
+
+  String get message => LocationService.messageForStatus(status);
+}
 
 /// Loads events from API; priority chips filter/sort on device only.
 class IncidentsController extends ChangeNotifier {
@@ -16,9 +25,7 @@ class IncidentsController extends ChangeNotifier {
 
   final EventsApi _eventsApi;
 
-  static const LatLng _karachiFallback = LatLng(24.8607, 67.0011);
-
-  IncidentListMode mode = IncidentListMode.nearby;
+  IncidentListMode mode = IncidentListMode.all;
   final Set<IncidentPriority> activePriorityFilters = <IncidentPriority>{};
 
   List<Incident> _allIncidents = <Incident>[];
@@ -29,6 +36,9 @@ class IncidentsController extends ChangeNotifier {
   bool mapEventsLoading = false;
   String? errorMessage;
   String? mapEventsError;
+
+  /// Set when Nearby tab fails due to missing GPS / permission.
+  LocationAccessStatus? nearbyLocationStatus;
 
   /// Bumped on each [load]; stale responses are ignored after tab/mode switches.
   int _loadGeneration = 0;
@@ -41,6 +51,11 @@ class IncidentsController extends ChangeNotifier {
   /// One-shot: [MainShell] switches bottom navigation to the Map tab, then clears via [clearSwitchToMapTabPending].
   bool get switchToMapTabPending => _switchToMapTabPending;
 
+  bool get isNearbyLocationBlocked =>
+      mode == IncidentListMode.nearby &&
+      nearbyLocationStatus != null &&
+      nearbyLocationStatus != LocationAccessStatus.granted;
+
   /// Incidents with valid coordinates for map markers.
   List<Incident> get mapEventsWithCoordinates => mapEvents
       .where((Incident i) => i.latitude != 0 || i.longitude != 0)
@@ -50,6 +65,15 @@ class IncidentsController extends ChangeNotifier {
     List<Incident> list = List<Incident>.from(_allIncidents);
     if (mode == IncidentListMode.priority) {
       sortIncidentsByPriority(list);
+      if (activePriorityFilters.isEmpty) {
+        list = list
+            .where(
+              (Incident i) =>
+                  i.priority != IncidentPriority.low &&
+                  i.priority != IncidentPriority.unknown,
+            )
+            .toList();
+      }
     }
     return filterIncidentsByPriorities(list, activePriorityFilters);
   }
@@ -58,6 +82,9 @@ class IncidentsController extends ChangeNotifier {
     final int generation = ++_loadGeneration;
     isLoading = true;
     errorMessage = null;
+    if (mode != IncidentListMode.nearby) {
+      nearbyLocationStatus = null;
+    }
     notifyListeners();
 
     try {
@@ -66,6 +93,16 @@ class IncidentsController extends ChangeNotifier {
         _allIncidents = incidentsFromApiList(response.events);
         nearestArea = response.nearestArea;
         errorMessage = null;
+        if (mode == IncidentListMode.nearby) {
+          nearbyLocationStatus = LocationAccessStatus.granted;
+        }
+      }
+    } on NearbyLocationRequired catch (e) {
+      if (!_isStaleLoad(generation)) {
+        nearbyLocationStatus = e.status;
+        errorMessage = e.message;
+        _allIncidents = <Incident>[];
+        nearestArea = null;
       }
     } on ApiException catch (e) {
       if (!_isStaleLoad(generation)) {
@@ -106,7 +143,10 @@ class IncidentsController extends ChangeNotifier {
   }
 
   Future<void> setMode(IncidentListMode newMode) async {
-    if (mode == newMode && _allIncidents.isNotEmpty && errorMessage == null) {
+    if (mode == newMode &&
+        _allIncidents.isNotEmpty &&
+        errorMessage == null &&
+        !isNearbyLocationBlocked) {
       notifyListeners();
       return;
     }
@@ -115,6 +155,9 @@ class IncidentsController extends ChangeNotifier {
     _allIncidents = <Incident>[];
     nearestArea = null;
     errorMessage = null;
+    if (newMode != IncidentListMode.nearby) {
+      nearbyLocationStatus = null;
+    }
     isLoading = true;
     notifyListeners();
     await load();
@@ -159,11 +202,21 @@ class IncidentsController extends ChangeNotifier {
   Future<EventsListResponse> _fetchForMode() async {
     switch (mode) {
       case IncidentListMode.nearby:
-        final LocationAccess access = await LocationService.getCurrentLocation();
+        final LocationAccess access =
+            await LocationService.getCurrentLocationForNearby();
+        nearbyLocationStatus = access.status;
         final LatLng? position = access.position;
-        final double lat = position?.latitude ?? _karachiFallback.latitude;
-        final double lng = position?.longitude ?? _karachiFallback.longitude;
-        return _eventsApi.fetchNearest(lat: lat, lng: lng);
+        if (!access.isSuccess || position == null) {
+          throw NearbyLocationRequired(
+            access.status == LocationAccessStatus.granted
+                ? LocationAccessStatus.unavailable
+                : access.status,
+          );
+        }
+        return _eventsApi.fetchNearest(
+          lat: position.latitude,
+          lng: position.longitude,
+        );
       case IncidentListMode.priority:
       case IncidentListMode.all:
         return _eventsApi.fetchAll();
