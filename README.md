@@ -39,7 +39,7 @@ graph TD
 
 ## 🛠️ Mobile Tech Stack
 
-- **Framework**: [Flutter](https://flutter.dev/) (SDK `^3.10.4`)
+- **Framework**: [Flutter](https://flutter.dev/) (SDK `^3.38.4`)
 - **State Management**: `provider` for structured UI updates.
 - **Geospatial & Location**: `google_maps_flutter` and `geolocator` for mapping and nearby computations.
 - **Charts & Graphs**: `syncfusion_flutter_charts` for beautiful trend rendering.
@@ -52,7 +52,7 @@ graph TD
 
 ### Prerequisites
 
-- Flutter SDK (version `^3.10.4` or higher)
+- Flutter SDK (version `^3.38.4` or higher)
 - Android Studio / VS Code / Xcode
 - A running emulator or physical mobile device
 
