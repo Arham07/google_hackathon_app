@@ -48,6 +48,12 @@ graph TD
 
 ---
 
+## 🚀 Antigravity LOGS__
+
+https://github.com/user-attachments/assets/a20e219e-9356-47b6-a049-fc8b2bafab04
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
