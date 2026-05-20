@@ -1,6 +1,6 @@
 /// Backend base URL for BaKhabarEvents + user-reports APIs.
 abstract final class ApiConfig {
-  static const String baseUrl = 'https://ciro-backeend-app.netlify.app';
+  static const String baseUrl = 'https://bakhabar-app.netlify.app/';
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
